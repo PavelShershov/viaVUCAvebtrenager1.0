@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AR-сканер</title>
+
+<script src="js/aframe.min.js"></script>
+<script src="js/mindar-image-aframe.prod.js"></script>
+<script src="js/aframe-extras.min.js"></script>
+
+<style>
+.mindar-ui-overlay { display:none !important; }
+
+body{
+  margin:0;
+  overflow:hidden;
+  touch-action:none;
+}
+
+.a-enter-vr{
+  display:none !important;
+}
+
+.control-btn{
+  position:absolute;
+  z-index:1000;
+  width:62px;
+  height:62px;
+  font-size:28px;
+  background:rgba(255,255,255,0.82);
+  color:#173245;
+  border:1px solid rgba(30,76,96,0.24);
+  border-radius:22px;
+  cursor:pointer;
+  backdrop-filter:blur(14px) saturate(150%);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Arial, 'Segoe UI Symbol', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  font-weight:800;
+  line-height:1;
+  box-shadow:
+    0 14px 34px rgba(15, 47, 67, 0.24),
+    inset 0 1px 0 rgba(255,255,255,0.86),
+    inset 0 -12px 22px rgba(30,76,96,0.08);
+  transition:
+    opacity 0.3s,
+    top 0.3s,
+    right 0.3s,
+    bottom 0.3s,
+    left 0.3s,
+    transform 0.3s,
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.control-btn:hover{
+  background:rgba(255,255,255,0.94);
+  border-color:rgba(43,133,110,0.42);
+  box-shadow:
+    0 18px 42px rgba(15, 47, 67, 0.30),
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    0 0 0 4px rgba(43,133,110,0.10);
+}
+
+.control-btn:active{
+  transform:scale(0.96);
+}
+
+.control-btn:disabled{
+  opacity:0.38;
+  pointer-events:none;
+  filter:saturate(0.75);
+}
+
+#resetBtn{
+  top:20px;
+  left:20px;
+  background:rgba(255,255,255,0.86);
+  color:#c64040;
+  border-color:rgba(198,64,64,0.30);
+}
+
+#fullscreenBtn{
+  top:20px;
+  right:20px;
+  background:rgba(255,255,255,0.86);
+  color:#173245;
+}
+
+#rewindBtn{
+  left:20px;
+  bottom:30px;
+  background:rgba(255,255,255,0.86);
+  color:#1f5d64;
+}
+
+#controlBtn{
+  left:50%;
+  transform:translateX(-50%);
+  bottom:30px;
+  background:linear-gradient(135deg, #42c47b 0%, #1ca6a8 52%, #2487d6 100%);
+  color:#ffffff;
+  border-color:rgba(255,255,255,0.34);
+  box-shadow:
+    0 18px 44px rgba(28,166,168,0.34),
+    inset 0 1px 0 rgba(255,255,255,0.34),
+    inset 0 -14px 26px rgba(0,0,0,0.12);
+}
+
+#controlBtn:active{
+  transform:translateX(-50%) scale(0.96);
+}
+
+#forwardBtn{
+  right:20px;
+  bottom:30px;
+  background:rgba(255,255,255,0.86);
+  color:#1f5d64;
+}
+
+#progress-container{
+  position:fixed;
+  bottom:110px;
+  left:20px;
+  right:20px;
+  z-index:100;
+  background:rgba(0,0,0,0.7);
+  color:white;
+  padding:12px 20px;
+  border-radius:30px;
+  text-align:center;
+  font-size:16px;
+  backdrop-filter:blur(5px);
+  max-width:300px;
+  margin:0 auto;
+  pointer-events:none;
+  transition:opacity .5s, top 0.3s, bottom 0.3s;
+}
+
+#progress-bar{
+  height:4px;
+  background:#007aff;
+  width:0%;
+  border-radius:2px;
+  margin-top:8px;
+  transition:width .2s;
+}
+
+/* ---------- Ландшафтный режим ---------- */
+
+body.landscape #resetBtn{
+  top:20px;
+  left:20px;
+}
+
+body.landscape #fullscreenBtn{
+  top:20px;
+  right:20px;
+  background:rgba(255,255,255,0.86);
+  color:#173245;
+}
+
+body.landscape #rewindBtn{
+  left:calc(50% - 140px);
+  right:auto;
+  bottom:30px;
+}
+
+body.landscape #controlBtn{
+  left:50%;
+  right:auto;
+  bottom:30px;
+  transform:translateX(-50%);
+}
+
+body.landscape #forwardBtn{
+  left:calc(50% + 80px);
+  right:auto;
+  bottom:30px;
+}
+
+body.landscape #progress-container{
+  bottom:30px;
+  left:20px;
+  right:auto;
+  max-width:260px;
+}
+
+/* ---------- Портретный режим ---------- */
+
+body.portrait #rewindBtn{
+  left:20px;
+  right:auto;
+  bottom:30px;
+}
+
+body.portrait #controlBtn{
+  left:50%;
+  right:auto;
+  bottom:30px;
+  transform:translateX(-50%);
+}
+
+body.portrait #forwardBtn{
+  right:20px;
+  bottom:30px;
+  background:rgba(255,255,255,0.86);
+  color:#1f5d64;
+}
+
+body.portrait #progress-container{
+  bottom:110px;
+  left:20px;
+  right:20px;
+  max-width:300px;
+}
+</style>
+
+<script>
+const AR_CONFIG = [
+  {
+    targetIndex: 0,
+    modelId: 'siga',
+    modelSrc: 'models/surk.glb',
+    position: '0 0 0',
+    rotation: '90 0 0',
+    scale: '0.3 0.3 0.3',
+    animationClip: '*',
+    minScale: 0.1,
+    maxScale: 1
+  },
+  {
+    targetIndex: 1,
+    modelId: 'fan',
+    modelSrc: 'models/fan.glb',
+    position: '0 0 0',
+    rotation: '90 0 0',
+    scale: '0.3 0.3 0.3',
+    animationClip: '*',
+    minScale: 0.1,
+    maxScale: 1
+  },
+  {
+    targetIndex: 2,
+    modelId: 'hnef',
+    modelSrc: 'models/hnef.glb',
+    position: '0 0 0',
+    rotation: '90 0 0',
+    scale: '0.3 0.3 0.3',
+    animationClip: '*',
+    minScale: 0.1,
+    maxScale: 1
+  },
+  {
+    targetIndex: 3,
+    modelId: 'dabl',
+    modelSrc: 'models/dabl.glb',
+    position: '0 0 0',
+    rotation: '90 0 0',
+    scale: '0.3 0.3 0.3',
+    animationClip: '*',
+    minScale: 0.1,
+    maxScale: 1
+  },
+  {
+    targetIndex: 4,
+    modelId: 'akl',
+    modelSrc: 'models/surk.glb',
+    position: '0 0 0',
+    rotation: '90 0 0',
+    scale: '0.3 0.3 0.3',
+    animationClip: '*',
+    minScale: 0.1,
+    maxScale: 1
+  },
+  {
+    targetIndex: 5,
+    modelId: 'surk',
+    modelSrc: 'models/akl.glb',
+    position: '0 0 0',
+    rotation: '90 0 0',
+    scale: '0.3 0.3 0.3',
+    animationClip: '*',
+    minScale: 0.1,
+    maxScale: 1
+  }
+];
+
+window.activeModel = null;
+window.activeTargetIndex = null;
+window.isOrientationChanging = false;
+
+AFRAME.registerComponent('ar-animation-controller', {
+  schema: {
+    clip: { type: 'string', default: '*' },
+    targetIndex: { type: 'int', default: -1 }
+  },
+
+  init: function () {
+    this._modelLoaded = false;
+    this._animationStarted = false;
+    this._detached = false;
+    this._ignoreActivation = false;
+    this._targetVisible = false;
+
+    this._isPaused = false;
+    this._isFinished = false;
+    this._hasStartedPlayback = false;
+    this._currentSpeed = 1;
+
+    this._targetEntity = this.el.parentEl;
+    this._modelEl = this.el.querySelector('a-gltf-model');
+
+    this._onTargetFound = this._onTargetFound.bind(this);
+    this._onTargetLost = this._onTargetLost.bind(this);
+    this._onModelLoaded = this._onModelLoaded.bind(this);
+
+    this._targetEntity.addEventListener('targetFound', this._onTargetFound);
+    this._targetEntity.addEventListener('targetLost', this._onTargetLost);
+
+    if (this._modelEl) {
+      this._modelEl.addEventListener('model-loaded', this._onModelLoaded);
+    }
+
+    this.el.object3D.visible = false;
+  },
+
+  _onModelLoaded: function () {
+    this._modelLoaded = true;
+
+    const mesh = this._modelEl.getObject3D('mesh');
+    if (mesh && mesh.animations) {
+      console.log('[AR] клипы модели:', this._modelEl.id);
+      mesh.animations.forEach((clip, index) => {
+        console.log(index, clip.name, 'duration:', clip.duration);
+      });
+    }
+
+    console.log('[AR] модель загружена:', this._modelEl.id);
+  },
+
+  _getAnimComponent: function () {
+    if (!this._modelEl) return null;
+    return this._modelEl.components['animation-mixer'] || null;
+  },
+
+  _getActions: function () {
+    const anim = this._getAnimComponent();
+    if (!anim || !anim.mixer) return [];
+    return anim.mixer._actions || [];
+  },
+
+  _resetAllActions: function () {
+    const actions = this._getActions();
+
+    actions.forEach(action => {
+      action.reset();
+      action.enabled = true;
+      action.paused = false;
+      action.clampWhenFinished = true;
+      action.setLoop(THREE.LoopOnce, 1);
+    });
+  },
+
+  _playFromStart: function () {
+    const anim = this._getAnimComponent();
+    if (!anim || !anim.mixer) return;
+
+    anim.mixer.timeScale = 1;
+    this._currentSpeed = 1;
+    this._isPaused = false;
+    this._isFinished = false;
+    this._hasStartedPlayback = true;
+
+    this._resetAllActions();
+
+    const actions = this._getActions();
+    if (actions.length > 0) {
+      actions.forEach(action => {
+        action.reset();
+        action.play();
+      });
+    } else {
+      anim.mixer.setTime(0);
+      if (typeof anim.play === 'function') {
+        anim.play();
+      }
+    }
+  },
+
+  _ensureAnimationStarted: function () {
+    if (!this._modelEl) return;
+
+    if (!this._animationStarted) {
+      this._modelEl.setAttribute('animation-mixer', {
+        clip: this.data.clip,
+        loop: 'once',
+        clampWhenFinished: true,
+        timeScale: 1
+      });
+
+      this._animationStarted = true;
+
+      requestAnimationFrame(() => {
+        this._playFromStart();
+        this.el.emit('model-activated', { modelEl: this._modelEl });
+      });
+    }
+  },
+
+  _allActionsFinished: function () {
+    const actions = this._getActions();
+    if (!actions.length) return false;
+
+    const epsilon = 0.03;
+
+    const relevantActions = actions.filter(action => {
+      const clip = typeof action.getClip === 'function' ? action.getClip() : null;
+      return clip && clip.duration > 0;
+    });
+
+    if (!relevantActions.length) return false;
+
+    return relevantActions.every(action => {
+      const clip = action.getClip();
+      return action.time >= (clip.duration - epsilon);
+    });
+  },
+
+  tick: function () {
+    if (!this._animationStarted) return;
+    if (this._isPaused) return;
+    if (this._isFinished) return;
+    if (!this._hasStartedPlayback) return;
+    if (window.activeModel !== this._modelEl) return;
+    if (this._currentSpeed <= 0) return;
+
+    if (this._allActionsFinished()) {
+      this._isFinished = true;
+      this.el.emit('animation-finished', { modelEl: this._modelEl });
+    }
+  },
+
+  _onTargetFound: function () {
+    if (!this._modelLoaded) return;
+    if (this._ignoreActivation) return;
+    if (window.isOrientationChanging) return;
+
+    this._targetVisible = true;
+    console.log('[AR] маркер найден:', this._modelEl.id);
+
+    requestAnimationFrame(() => {
+      const wrapperObj = this.el.object3D;
+
+      if (window.activeModel && window.activeModel !== this._modelEl) {
+        return;
+      }
+
+      if (
+        window.activeTargetIndex !== null &&
+        window.activeTargetIndex !== this.data.targetIndex
+      ) {
+        return;
+      }
+
+      if (this._detached) {
+        this._targetEntity.object3D.attach(wrapperObj);
+        wrapperObj.position.set(0, 0, 0);
+        wrapperObj.rotation.set(0, 0, 0);
+        wrapperObj.scale.set(1, 1, 1);
+        this._detached = false;
+        console.log('[AR] контейнер примагнитился обратно:', this._modelEl.id);
+      }
+
+      this.el.object3D.visible = true;
+
+      if (!window.activeModel) {
+        window.activeModel = this._modelEl;
+        window.activeTargetIndex = this.data.targetIndex;
+        this._ensureAnimationStarted();
+        this.el.emit('model-activated', { modelEl: this._modelEl });
+      }
+    });
+  },
+
+  _onTargetLost: function () {
+    if (!this._modelLoaded) return;
+    if (window.isOrientationChanging) return;
+    if (window.activeModel && window.activeModel !== this._modelEl) return;
+
+    this._targetVisible = false;
+    console.log('[AR] маркер потерян:', this._modelEl.id);
+
+    const wrapperObj = this.el.object3D;
+    const scene = this.el.sceneEl;
+
+    const worldPos = new THREE.Vector3();
+    const worldQuat = new THREE.Quaternion();
+    const worldScale = new THREE.Vector3();
+
+    wrapperObj.getWorldPosition(worldPos);
+    wrapperObj.getWorldQuaternion(worldQuat);
+    wrapperObj.getWorldScale(worldScale);
+
+    scene.object3D.attach(wrapperObj);
+
+    wrapperObj.position.copy(worldPos);
+    wrapperObj.quaternion.copy(worldQuat);
+
+    if (
+      isFinite(worldScale.x) && isFinite(worldScale.y) && isFinite(worldScale.z) &&
+      worldScale.x !== 0 && worldScale.y !== 0 && worldScale.z !== 0
+    ) {
+      wrapperObj.scale.copy(worldScale);
+    } else {
+      wrapperObj.scale.set(1, 1, 1);
+    }
+
+    this._detached = true;
+
+    if (this._ignoreActivation) {
+      this._ignoreActivation = false;
+    }
+
+    console.log('[AR] контейнер остался в мире:', this._modelEl.id);
+  },
+
+  play: function () {
+    const anim = this._getAnimComponent();
+    if (!anim) return;
+
+    this._isPaused = false;
+
+    if (anim.mixer) {
+      anim.mixer.timeScale = 1;
+      this._currentSpeed = 1;
+      const actions = this._getActions();
+      actions.forEach(action => {
+        action.paused = false;
+      });
+    }
+
+    if (typeof anim.play === 'function') {
+      anim.play();
+    }
+  },
+
+  pause: function () {
+    const anim = this._getAnimComponent();
+    if (!anim) return;
+
+    this._isPaused = true;
+
+    if (anim.mixer) {
+      const actions = this._getActions();
+      actions.forEach(action => {
+        action.paused = true;
+      });
+    }
+
+    if (typeof anim.pause === 'function') {
+      anim.pause();
+    }
+  },
+
+  replay: function () {
+    this._playFromStart();
+  },
+
+  setSpeed: function (speed) {
+    const anim = this._getAnimComponent();
+    if (!anim || !anim.mixer) return;
+
+    this._isPaused = false;
+    this._currentSpeed = speed;
+
+    if (speed !== 0) {
+      this._isFinished = false;
+    }
+
+    anim.mixer.timeScale = speed;
+
+    const actions = this._getActions();
+    actions.forEach(action => {
+      action.paused = false;
+    });
+  },
+
+  isFinished: function () {
+    return this._isFinished;
+  },
+
+  isPaused: function () {
+    return this._isPaused;
+  },
+
+  reset: function () {
+    console.log('[AR] reset:', this._modelEl.id);
+
+    if (window.activeModel === this._modelEl) {
+      window.activeModel = null;
+    }
+
+    if (window.activeTargetIndex === this.data.targetIndex) {
+      window.activeTargetIndex = null;
+    }
+
+    const anim = this._getAnimComponent();
+
+    if (anim) {
+      if (anim.mixer) {
+        anim.mixer.timeScale = 1;
+        const actions = this._getActions();
+        actions.forEach(action => {
+          action.stop();
+          action.reset();
+        });
+        anim.mixer.setTime(0);
+      }
+
+      if (typeof anim.stop === 'function') {
+        anim.stop();
+      } else if (typeof anim.pause === 'function') {
+        anim.pause();
+      }
+    }
+
+    if (this._modelEl) {
+      this._modelEl.removeAttribute('animation-mixer');
+    }
+
+    this._animationStarted = false;
+    this._detached = false;
+    this._isPaused = false;
+    this._isFinished = false;
+    this._hasStartedPlayback = false;
+    this._currentSpeed = 1;
+
+    this.el.object3D.visible = false;
+
+    this._targetEntity.object3D.attach(this.el.object3D);
+    this.el.object3D.position.set(0, 0, 0);
+    this.el.object3D.rotation.set(0, 0, 0);
+    this.el.object3D.scale.set(1, 1, 1);
+
+    this._ignoreActivation = this._targetVisible;
+
+    this.el.emit('model-reset', { modelEl: this._modelEl });
+  },
+
+  remove: function () {
+    if (this._targetEntity) {
+      this._targetEntity.removeEventListener('targetFound', this._onTargetFound);
+      this._targetEntity.removeEventListener('targetLost', this._onTargetLost);
+    }
+
+    if (this._modelEl) {
+      this._modelEl.removeEventListener('model-loaded', this._onModelLoaded);
+    }
+  }
+});
+</script>
+</head>
+
+<body>
+
+<button id="resetBtn" class="control-btn">✕</button>
+<button id="fullscreenBtn" class="control-btn">⛶</button>
+<button id="rewindBtn" class="control-btn" disabled>⏪</button>
+<button id="controlBtn" class="control-btn" disabled>▶</button>
+<button id="forwardBtn" class="control-btn" disabled>⏩</button>
+
+<div id="progress-container">
+  <span id="progress-text">Загрузка модели 0%</span>
+  <div id="progress-bar"></div>
+</div>
+
+<a-scene
+mindar-image="imageTargetSrc:markers/targets.mind; autoStart:true; uiLoading:false; uiScanning:false; uiError:false; warmupTolerance:1; missTolerance:1; filterMinCF:0.001; filterBeta:1500; maxTrack:1;"
+vr-mode-ui="enabled:false"
+device-orientation-permission-ui="enabled:false"
+>
+  <a-assets></a-assets>
+  <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+</a-scene>
+
+<script>
+(function () {
+  const scene = document.querySelector('a-scene');
+  const assetsEl = document.querySelector('a-assets');
+
+  const progressContainer = document.getElementById('progress-container');
+  const progressText = document.getElementById('progress-text');
+  const progressBar = document.getElementById('progress-bar');
+
+  const resetBtn = document.getElementById('resetBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  const rewindBtn = document.getElementById('rewindBtn');
+  const controlBtn = document.getElementById('controlBtn');
+  const forwardBtn = document.getElementById('forwardBtn');
+  const allButtons = document.querySelectorAll('.control-btn');
+
+  const loadState = {};
+  const modelEls = [];
+
+  let orientationResetTimer = null;
+  let lastLayoutMode = null;
+
+  function getMindARSystem() {
+    return scene.systems['mindar-image-system'] || null;
+  }
+
+  async function tryLockPortrait() {
+    if (!screen.orientation || !screen.orientation.lock) return;
+
+    try {
+      await screen.orientation.lock('portrait');
+      console.log('[UI] portrait lock success');
+    } catch (e) {
+      console.log('[UI] portrait lock not available', e);
+    }
+  }
+
+  function getActiveModel() {
+    return window.activeModel || null;
+  }
+
+  function getActiveController() {
+    const modelEl = getActiveModel();
+    if (!modelEl || !modelEl.parentEl) return null;
+    return modelEl.parentEl.components['ar-animation-controller'] || null;
+  }
+
+  function setButtonsDisabled(disabled) {
+    controlBtn.disabled = disabled;
+    rewindBtn.disabled = disabled;
+    forwardBtn.disabled = disabled;
+
+    if (disabled) {
+      controlBtn.textContent = '▶';
+    }
+  }
+
+  function setPlayingUI() {
+    controlBtn.disabled = false;
+    rewindBtn.disabled = false;
+    forwardBtn.disabled = false;
+    controlBtn.textContent = '⏸';
+  }
+
+  function setPausedUI() {
+    controlBtn.disabled = false;
+    rewindBtn.disabled = false;
+    forwardBtn.disabled = false;
+    controlBtn.textContent = '▶';
+  }
+
+  function setReplayUI() {
+    controlBtn.disabled = false;
+    rewindBtn.disabled = false;
+    forwardBtn.disabled = false;
+    controlBtn.textContent = '↻';
+  }
+
+  setButtonsDisabled(true);
+
+  function refreshControlButtonState() {
+    const controller = getActiveController();
+    const modelEl = getActiveModel();
+
+    if (!controller || !modelEl) {
+      setButtonsDisabled(true);
+      return;
+    }
+
+    if (controller.isFinished()) {
+      setReplayUI();
+      return;
+    }
+
+    if (controller.isPaused()) {
+      setPausedUI();
+      return;
+    }
+
+    setPlayingUI();
+  }
+
+  function updateProgress() {
+    let totalLoaded = 0;
+    let totalSize = 0;
+    let hasTotal = false;
+
+    Object.values(loadState).forEach(s => {
+      totalLoaded += s.loaded;
+      if (s.total) {
+        totalSize += s.total;
+        hasTotal = true;
+      }
+    });
+
+    let percent;
+
+    if (hasTotal && totalSize > 0) {
+      percent = Math.min(Math.round((totalLoaded / totalSize) * 100), 99);
+    } else {
+      progressText.innerText = 'Загрузка модели…';
+      return;
+    }
+
+    progressText.innerText = `Загрузка модели ${percent}%`;
+    progressBar.style.width = percent + '%';
+  }
+
+  function onAllLoaded() {
+    progressText.innerText = 'Загрузка модели 100%';
+    progressBar.style.width = '100%';
+
+    setTimeout(() => {
+      progressContainer.style.opacity = '0';
+
+      setTimeout(() => {
+        progressContainer.style.display = 'none';
+      }, 500);
+    }, 1000);
+  }
+
+  let loadedCount = 0;
+
+  AR_CONFIG.forEach(cfg => {
+    const asset = document.createElement('a-asset-item');
+    asset.setAttribute('id', cfg.modelId);
+    asset.setAttribute('src', cfg.modelSrc);
+    assetsEl.appendChild(asset);
+
+    loadState[cfg.modelId] = { loaded: 0, total: 0 };
+
+    asset.addEventListener('progress', evt => {
+      if (evt.detail && evt.detail.totalBytes) {
+        loadState[cfg.modelId].loaded = evt.detail.loadedBytes;
+        loadState[cfg.modelId].total = evt.detail.totalBytes;
+        updateProgress();
+      }
+    });
+
+    asset.addEventListener('loaded', () => {
+      loadedCount++;
+      loadState[cfg.modelId].loaded = loadState[cfg.modelId].total || 1;
+
+      if (loadedCount === AR_CONFIG.length) {
+        onAllLoaded();
+      }
+    });
+
+    asset.addEventListener('error', () => {
+      progressText.innerText = `Ошибка загрузки: ${cfg.modelSrc}`;
+    });
+
+    const targetEntity = document.createElement('a-entity');
+    targetEntity.setAttribute('mindar-image-target', `targetIndex:${cfg.targetIndex}`);
+
+    const wrapper = document.createElement('a-entity');
+    wrapper.setAttribute(
+      'ar-animation-controller',
+      `clip:${cfg.animationClip}; targetIndex:${cfg.targetIndex}`
+    );
+
+    const model = document.createElement('a-gltf-model');
+    model.setAttribute('id', cfg.modelId);
+    model.setAttribute('src', `#${cfg.modelId}`);
+    model.setAttribute('position', cfg.position);
+    model.setAttribute('rotation', cfg.rotation);
+    model.setAttribute('scale', cfg.scale);
+    model.dataset.minScale = String(cfg.minScale);
+    model.dataset.maxScale = String(cfg.maxScale);
+
+    wrapper.appendChild(model);
+    targetEntity.appendChild(wrapper);
+    scene.appendChild(targetEntity);
+
+    modelEls.push(model);
+
+    wrapper.addEventListener('model-activated', () => {
+      if (getActiveModel() === model) {
+        setPlayingUI();
+      }
+    });
+
+    wrapper.addEventListener('animation-finished', () => {
+      if (getActiveModel() === model) {
+        setReplayUI();
+      }
+    });
+
+    wrapper.addEventListener('model-reset', () => {
+      setButtonsDisabled(true);
+    });
+  });
+
+  function toggleFullscreen() {
+    const elem = document.documentElement;
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+  }
+
+  fullscreenBtn.addEventListener('click', async () => {
+    toggleFullscreen();
+    setTimeout(() => {
+      tryLockPortrait();
+    }, 300);
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    tryLockPortrait();
+  });
+
+  let pinchStartDistance = null;
+  let pinchStartScale = null;
+
+  function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function setUniformScale(modelEl, value) {
+    const minScale = parseFloat(modelEl.dataset.minScale || '0.1');
+    const maxScale = parseFloat(modelEl.dataset.maxScale || '1');
+    const clamped = Math.max(minScale, Math.min(maxScale, value));
+    modelEl.setAttribute('scale', `${clamped} ${clamped} ${clamped}`);
+  }
+
+  scene.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 2) return;
+
+    const modelEl = getActiveModel();
+    if (!modelEl) return;
+
+    e.preventDefault();
+
+    pinchStartDistance = getDistance(e.touches);
+
+    const currentScale = modelEl.getAttribute('scale');
+    pinchStartScale = currentScale.x;
+  }, { passive: false });
+
+  scene.addEventListener('touchmove', function (e) {
+    if (e.touches.length !== 2) return;
+    if (pinchStartDistance === null || pinchStartScale === null) return;
+
+    const modelEl = getActiveModel();
+    if (!modelEl) return;
+
+    e.preventDefault();
+
+    const currentDistance = getDistance(e.touches);
+    const ratio = currentDistance / pinchStartDistance;
+    const newScale = pinchStartScale * ratio;
+
+    setUniformScale(modelEl, newScale);
+  }, { passive: false });
+
+  scene.addEventListener('touchend', function (e) {
+    if (e.touches.length < 2) {
+      pinchStartDistance = null;
+      pinchStartScale = null;
+    }
+  }, { passive: false });
+
+  scene.addEventListener('touchcancel', function () {
+    pinchStartDistance = null;
+    pinchStartScale = null;
+  }, { passive: false });
+
+  controlBtn.addEventListener('click', () => {
+    const controller = getActiveController();
+    const modelEl = getActiveModel();
+    if (!controller || !modelEl) return;
+
+    if (controlBtn.textContent === '⏸') {
+      controller.pause();
+      setPausedUI();
+    } else if (controlBtn.textContent === '▶') {
+      controller.play();
+      setPlayingUI();
+    } else if (controlBtn.textContent === '↻') {
+      controller.replay();
+      setPlayingUI();
+    }
+  });
+
+  function setSpeed(speed) {
+    const controller = getActiveController();
+    if (!controller) return;
+
+    controller.setSpeed(speed);
+    refreshControlButtonState();
+  }
+
+  forwardBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    setSpeed(2);
+  });
+
+  forwardBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    setSpeed(1);
+  });
+
+  forwardBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    setSpeed(2);
+  });
+
+  forwardBtn.addEventListener('mouseup', (e) => {
+    e.preventDefault();
+    setSpeed(1);
+  });
+
+  forwardBtn.addEventListener('mouseleave', () => {
+    setSpeed(1);
+  });
+
+  rewindBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    setSpeed(-2);
+  });
+
+  rewindBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    setSpeed(1);
+  });
+
+  rewindBtn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    setSpeed(-2);
+  });
+
+  rewindBtn.addEventListener('mouseup', (e) => {
+    e.preventDefault();
+    setSpeed(1);
+  });
+
+  rewindBtn.addEventListener('mouseleave', () => {
+    setSpeed(1);
+  });
+
+  window.addEventListener('blur', () => {
+    setSpeed(1);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    modelEls.forEach(modelEl => {
+      const wrapper = modelEl.parentEl;
+      const comp = wrapper && wrapper.components['ar-animation-controller'];
+      if (comp) comp.reset();
+    });
+
+    setButtonsDisabled(true);
+  });
+
+  let tapCount = 0;
+  let tapTimer = null;
+  const HIDE_DELAY = 500;
+
+  function resetTapCount() {
+    tapCount = 0;
+    if (tapTimer) {
+      clearTimeout(tapTimer);
+      tapTimer = null;
+    }
+  }
+
+  function toggleInterface() {
+    const anyVisible = allButtons[0]?.style.display !== 'none';
+    const newDisplay = anyVisible ? 'none' : 'flex';
+    allButtons.forEach(btn => btn.style.display = newDisplay);
+  }
+
+  scene.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) {
+      resetTapCount();
+      return;
+    }
+
+    tapCount++;
+    if (tapTimer) clearTimeout(tapTimer);
+    tapTimer = setTimeout(resetTapCount, HIDE_DELAY);
+
+    if (tapCount === 2) {
+      e.preventDefault();
+      tapCount = 0;
+      clearTimeout(tapTimer);
+      tapTimer = null;
+      toggleInterface();
+    }
+  }, { passive: false });
+
+  let swipeStartY = null;
+  let swipeStartTime = null;
+  const SWIPE_THRESHOLD = 50;
+  const SWIPE_TIME_LIMIT = 500;
+
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+  }
+
+  function enterFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+  }
+
+  function exitFullscreen() {
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+  }
+
+  scene.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) {
+      swipeStartY = null;
+      return;
+    }
+    swipeStartY = e.touches[0].clientY;
+    swipeStartTime = Date.now();
+  });
+
+  scene.addEventListener('touchmove', (e) => {
+    if (swipeStartY === null || e.touches.length !== 1) return;
+
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - swipeStartY;
+    const deltaTime = Date.now() - swipeStartTime;
+
+    if (Math.abs(deltaY) > SWIPE_THRESHOLD && deltaTime < SWIPE_TIME_LIMIT) {
+      const fullscreen = isFullscreen();
+
+      if (fullscreen) {
+        e.preventDefault();
+        exitFullscreen();
+        swipeStartY = null;
+      } else {
+        if (deltaY > 0) {
+          e.preventDefault();
+          enterFullscreen();
+          swipeStartY = null;
+        }
+      }
+    }
+  });
+
+  scene.addEventListener('touchend', () => {
+    swipeStartY = null;
+  });
+
+  function updateOrientationUI() {
+    const mode = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+
+    document.body.classList.remove('landscape', 'portrait');
+    document.body.classList.add(mode);
+
+    return mode;
+  }
+
+  function restartMindARAfterOrientation() {
+    const arSystem = getMindARSystem();
+    if (!arSystem) return;
+
+    window.isOrientationChanging = true;
+
+    if (orientationResetTimer) {
+      clearTimeout(orientationResetTimer);
+      orientationResetTimer = null;
+    }
+
+    try {
+      arSystem.stop();
+    } catch (e) {
+      console.warn('[AR] stop error after orientation', e);
+    }
+
+    orientationResetTimer = setTimeout(async () => {
+      try {
+        if (scene.renderer) {
+          scene.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        if (scene.camera) {
+          scene.camera.aspect = window.innerWidth / window.innerHeight;
+          scene.camera.updateProjectionMatrix();
+        }
+
+        await arSystem.start();
+
+        setTimeout(() => {
+          window.isOrientationChanging = false;
+        }, 500);
+      } catch (e) {
+        console.warn('[AR] restart error after orientation', e);
+        window.isOrientationChanging = false;
+      }
+    }, 500);
+  }
+
+  function handleBrowserOrientationChange() {
+    const newMode = updateOrientationUI();
+
+    if (newMode !== lastLayoutMode) {
+      lastLayoutMode = newMode;
+      restartMindARAfterOrientation();
+    }
+  }
+
+  window.addEventListener('resize', handleBrowserOrientationChange);
+  window.addEventListener('orientationchange', handleBrowserOrientationChange);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    tryLockPortrait();
+  });
+
+  window.addEventListener('load', () => {
+    tryLockPortrait();
+  });
+
+  lastLayoutMode = updateOrientationUI();
+
+})();
+</script>
+
+</body>
+</html>

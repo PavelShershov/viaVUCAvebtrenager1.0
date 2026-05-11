@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>viaVUCA · Турнирные ссылки</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 34%),
+                radial-gradient(circle at bottom right, rgba(83, 144, 122, 0.18), transparent 38%),
+                linear-gradient(145deg, #d4ece7 0%, #c2ded6 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #1e2b3c;
+            padding: 0.8rem 1rem;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .particle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(80, 120, 105, 0.16);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatParticle linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(105vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.45;
+            }
+
+            80% {
+                opacity: 0.45;
+            }
+
+            100% {
+                transform: translateY(-20vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 10;
+            width: min(1180px, 100%);
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .top-bar-left,
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(6px);
+            border: 1px solid #cbdbe2;
+            border-radius: 999px;
+            color: #1a3b4f;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            padding: 0.65rem 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 18px -16px rgba(18, 40, 60, 0.5);
+        }
+
+        .back-button:hover {
+            background: #ffffff;
+            border-color: #9fb7c8;
+            transform: translateX(-2px);
+            box-shadow: 0 12px 22px -16px rgba(18, 40, 60, 0.65);
+        }
+
+        .back-button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .organizer-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            color: #2c7a47;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid #d8e4ee;
+            border-radius: 999px;
+            padding: 0.55rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+
+        .profile-menu {
+            position: relative;
+            z-index: 300;
+        }
+
+        .profile-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid #cbdbe2;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(6px);
+            color: #1a3b4f;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: inherit;
+            font-size: 1.05rem;
+            font-weight: 900;
+            box-shadow: 0 8px 18px -16px rgba(18, 40, 60, 0.5);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .profile-button:hover {
+            background: #ffffff;
+            border-color: #9fb7c8;
+            transform: translateY(-1px);
+            box-shadow: 0 12px 22px -16px rgba(18, 40, 60, 0.65);
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(44, 122, 71, 0.15), rgba(44, 95, 138, 0.15));
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.55rem);
+            width: 250px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 1.35rem;
+            box-shadow: 0 24px 45px -24px rgba(18, 40, 60, 0.55);
+            padding: 0.75rem;
+            display: none;
+            animation: menuIn 0.16s ease forwards;
+        }
+
+        .profile-dropdown.open {
+            display: block;
+        }
+
+        @keyframes menuIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .profile-head {
+            padding: 0.75rem 0.75rem 0.85rem;
+            border-bottom: 1px solid #e0eaf4;
+            margin-bottom: 0.45rem;
+        }
+
+        .profile-name {
+            color: #1a3b4f;
+            font-size: 0.95rem;
+            font-weight: 900;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .profile-login {
+            margin-top: 0.22rem;
+            color: #607584;
+            font-size: 0.76rem;
+            font-weight: 700;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .profile-menu-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #1a3b4f;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 0.95rem;
+            padding: 0.7rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            transition: all 0.16s ease;
+        }
+
+        .profile-menu-item:hover {
+            background: #f4f9ff;
+            color: #1e4663;
+        }
+
+        .profile-menu-item.logout {
+            color: #c94a4a;
+        }
+
+        .profile-menu-item.logout:hover {
+            background: #fdecea;
+            color: #b13e3e;
+        }
+
+        .main-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-radius: 2.4rem;
+            box-shadow: 0 24px 55px -22px rgba(18, 40, 60, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            padding: 2rem;
+            animation: fadeUp 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.05) forwards;
+            opacity: 0;
+            transform: translateY(18px);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-card::before {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: -86px;
+            top: -96px;
+            border-radius: 50%;
+            background: rgba(44, 122, 71, 0.08);
+            pointer-events: none;
+        }
+
+        .main-card::after {
+            content: "";
+            position: absolute;
+            width: 155px;
+            height: 155px;
+            left: -70px;
+            bottom: -70px;
+            border-radius: 50%;
+            background: rgba(44, 95, 138, 0.07);
+            pointer-events: none;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-head {
+            display: block;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid #dfe9f1;
+            margin-bottom: 1.25rem;
+        }
+
+        .lead-text {
+            color: #5a6e7c;
+            font-size: 0.96rem;
+            line-height: 1.5;
+            font-weight: 700;
+            max-width: 620px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4.2vw, 3.45rem);
+            line-height: 1.02;
+            font-weight: 800;
+            letter-spacing: -0.055em;
+            background: linear-gradient(135deg, #172637, #2a4a6e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: left;
+            margin-bottom: 0.7rem;
+        }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: minmax(180px, 260px);
+            gap: 0.9rem;
+            margin-bottom: 1.15rem;
+        }
+
+        .summary-card {
+            background: linear-gradient(155deg, rgba(238, 246, 252, 0.96), rgba(255, 255, 255, 0.9));
+            border: 1px solid #d9e5ee;
+            border-radius: 1.35rem;
+            padding: 1rem;
+            box-shadow:
+                0 12px 24px -22px rgba(18, 40, 60, 0.52),
+                inset 0 1px 0 rgba(255, 255, 255, 0.96);
+        }
+
+        .summary-value {
+            color: #1a3b4f;
+            font-size: 1.55rem;
+            line-height: 1;
+            font-weight: 900;
+            margin-top: 0.35rem;
+        }
+
+        .summary-title {
+            color: #607584;
+            font-size: 0.78rem;
+            line-height: 1.35;
+            font-weight: 800;
+        }
+
+        .links-area {
+            background: rgba(244, 249, 255, 0.58);
+            border: 1px solid #dfe9f1;
+            border-radius: 1.7rem;
+            padding: 1rem;
+            min-height: 320px;
+        }
+
+        .links-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.9rem;
+            padding: 0.1rem 0.2rem;
+        }
+
+        .links-title {
+            color: #1a3b4f;
+            font-size: 1.42rem;
+            line-height: 1.1;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        .links-subtitle {
+            color: #607584;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-top: 0.28rem;
+        }
+
+        .refresh-btn {
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 999px;
+            background: #2c5f8a;
+            color: white;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 900;
+            cursor: pointer;
+            padding: 0.67rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            box-shadow: 0 12px 22px -16px rgba(44, 95, 138, 0.85);
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover:not(:disabled) {
+            background: #1e4663;
+            transform: translateY(-1px);
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .link-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #d9e5ee;
+            border-radius: 1.45rem;
+            padding: 1rem;
+            box-shadow: 0 12px 24px -22px rgba(18, 40, 60, 0.52);
+            transition: all 0.2s ease;
+        }
+
+        .link-card:hover {
+            background: #ffffff;
+            border-color: #9fb7c8;
+            transform: translateY(-1px);
+            box-shadow: 0 18px 30px -24px rgba(18, 40, 60, 0.68);
+        }
+
+        .link-card-main {
+            display: grid;
+            grid-template-columns: minmax(170px, 0.82fr) minmax(250px, 1.18fr) minmax(130px, 0.42fr);
+            gap: 0.9rem;
+            align-items: center;
+        }
+
+        .organizer-name {
+            color: #1a3b4f;
+            font-size: 0.98rem;
+            font-weight: 900;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .tournament-title-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+            margin-bottom: 0.62rem;
+        }
+
+        .tournament-card-title {
+            color: #1a3b4f;
+            font-size: 1.18rem;
+            font-weight: 950;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+        .title-edit-btn {
+            flex: 0 0 auto;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 0.6rem;
+            background: #2c5f8a;
+            color: #ffffff;
+            padding: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 22px -16px rgba(44, 95, 138, 0.95);
+            transition: all 0.18s ease;
+        }
+
+        .title-edit-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .title-edit-btn:hover {
+            background: #1e405b;
+            transform: scale(0.97);
+        }
+
+        .title-edit-btn.saving {
+            opacity: 0.72;
+            pointer-events: none;
+        }
+
+        .created-by-label,
+        .created-date-label,
+        .link-label {
+            color: #8ba0b5;
+            font-size: 0.68rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 0.28rem;
+        }
+
+        .created-date {
+            color: #496273;
+            font-size: 0.9rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .link-copy-row {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+        }
+
+        .short-link {
+            flex: 1 1 auto;
+            min-width: 0;
+            background: rgba(244, 249, 255, 0.96);
+            border: 1px solid #d9e5ee;
+            border-left: 4px solid #e67e22;
+            border-radius: 999px;
+            padding: 0.6rem 0.85rem;
+            color: #1e4663;
+            font-size: 0.86rem;
+            font-weight: 850;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .copy-btn,
+        .details-btn {
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 999px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 0.6rem;
+            background: #2c5f8a;
+            color: #ffffff;
+            padding: 0;
+            font-size: 1rem;
+            box-shadow: 0 12px 22px -16px rgba(44, 95, 138, 0.95);
+        }
+
+        .copy-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .copy-btn:hover {
+            background: #1e405b;
+            transform: scale(0.97);
+        }
+
+        .copy-btn.copied {
+            background: #2c7a47;
+        }
+
+        .details-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid #d9e5ee;
+            color: #1e4663;
+            padding: 0.64rem 0.85rem;
+        }
+
+        .details-btn:hover {
+            background: #f4f9ff;
+            border-color: #9fb7c8;
+        }
+
+
+        .card-actions-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 0.65rem;
+            margin-top: 0.85rem;
+            align-items: stretch;
+        }
+
+        .delete-btn {
+            flex: 0 0 auto;
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 0.6rem;
+            background: #c94a4a;
+            color: #ffffff;
+            padding: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 22px -16px rgba(201, 74, 74, 0.95);
+            transition: all 0.18s ease;
+        }
+
+        .delete-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .delete-btn:hover {
+            background: #ad3e3e;
+            transform: scale(0.97);
+        }
+
+        .delete-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .details-arrow {
+            display: inline-block;
+            transition: transform 0.18s ease;
+        }
+
+        .link-card.open .details-arrow {
+            transform: rotate(180deg);
+        }
+
+        .details-panel {
+            display: none;
+            margin-top: 0.85rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid #e0eaf4;
+        }
+
+        .link-card.open .details-panel {
+            display: block;
+            animation: detailsIn 0.18s ease forwards;
+        }
+
+        @keyframes detailsIn {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .detail-item {
+            background: linear-gradient(155deg, rgba(238, 246, 252, 0.96), rgba(255, 255, 255, 0.9));
+            border: 1px solid #d9e5ee;
+            border-radius: 1.1rem;
+            padding: 0.8rem;
+        }
+
+        .detail-title {
+            color: #8ba0b5;
+            font-size: 0.68rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            color: #1a3b4f;
+            font-size: 0.86rem;
+            line-height: 1.35;
+            font-weight: 800;
+        }
+
+        .settings-report {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: linear-gradient(155deg, rgba(238, 246, 252, 0.96), rgba(255, 255, 255, 0.9));
+            border: 1px solid #d9e5ee;
+            border-radius: 1.2rem;
+            padding: 1rem;
+        }
+
+        .settings-report-row {
+            display: flex;
+            gap: 0.45rem;
+            align-items: baseline;
+            flex-wrap: wrap;
+            color: #1a3b4f;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            font-weight: 800;
+        }
+
+        .settings-report-label {
+            color: #607584;
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.55px;
+        }
+
+        .settings-report-value {
+            color: #1a3b4f;
+            font-weight: 900;
+        }
+
+        .settings-report-section-title {
+            color: #1a3b4f;
+            font-size: 0.95rem;
+            font-weight: 950;
+            margin-top: 0.1rem;
+        }
+
+        .settings-task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .settings-task-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: flex-start;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid #dfe9f1;
+            border-radius: 0.9rem;
+            padding: 0.62rem 0.75rem;
+        }
+
+        .settings-task-name {
+            color: #1a3b4f;
+            font-size: 0.86rem;
+            line-height: 1.35;
+            font-weight: 800;
+        }
+
+        .settings-task-count {
+            flex: 0 0 auto;
+            min-width: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: rgba(44, 122, 71, 0.12);
+            color: #2c7a47;
+            font-size: 0.78rem;
+            font-weight: 950;
+            padding: 0.2rem 0.5rem;
+        }
+
+        .settings-game-block {
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid #dfe9f1;
+            border-radius: 1rem;
+            padding: 0.75rem;
+        }
+
+        .settings-game-name {
+            color: #1a3b4f;
+            font-size: 0.92rem;
+            line-height: 1.3;
+            font-weight: 950;
+            margin-bottom: 0.45rem;
+        }
+
+        .settings-inline-tasks {
+            color: #496273;
+            font-size: 0.84rem;
+            line-height: 1.5;
+            font-weight: 750;
+        }
+
+        .empty-state {
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 1px dashed #cbdbe2;
+            border-radius: 1.45rem;
+            background: rgba(255, 255, 255, 0.55);
+            padding: 2rem 1rem;
+        }
+
+        .empty-icon {
+            width: 58px;
+            height: 58px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.25rem;
+            background: rgba(44, 122, 71, 0.12);
+            color: #2c7a47;
+            font-size: 1.7rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .empty-title {
+            color: #1a3b4f;
+            font-size: 1.05rem;
+            font-weight: 900;
+            margin-bottom: 0.35rem;
+        }
+
+        .empty-text {
+            max-width: 470px;
+            color: #607584;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            font-weight: 700;
+        }
+
+        .loading-state {
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 1px dashed #cbdbe2;
+            border-radius: 1.45rem;
+            background: rgba(255, 255, 255, 0.55);
+            padding: 2rem 1rem;
+        }
+
+        .loading-refresh-icon {
+            width: 58px;
+            height: 58px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1.25rem;
+            background: rgba(44, 95, 138, 0.12);
+            color: #2c5f8a;
+            font-size: 1.7rem;
+            font-weight: 900;
+            margin-bottom: 0.85rem;
+            animation: spinRefresh 0.9s linear infinite;
+        }
+
+        .loading-title {
+            color: #1a3b4f;
+            font-size: 1.05rem;
+            font-weight: 900;
+            margin-bottom: 0.35rem;
+        }
+
+        .loading-text {
+            max-width: 470px;
+            color: #607584;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            font-weight: 700;
+        }
+
+        @keyframes spinRefresh {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+
+
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: rgba(18, 40, 60, 0.48);
+            backdrop-filter: blur(5px);
+        }
+
+        .confirm-modal-overlay.open {
+            display: flex;
+        }
+
+        .confirm-modal {
+            width: min(520px, 100%);
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 1.8rem;
+            box-shadow: 0 28px 60px -28px rgba(18, 40, 60, 0.72);
+            padding: 1.25rem;
+            animation: confirmModalIn 0.18s ease forwards;
+        }
+
+        @keyframes confirmModalIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .confirm-modal-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            padding-bottom: 0.9rem;
+            border-bottom: 1px solid #e0eaf4;
+            margin-bottom: 1rem;
+        }
+
+        .confirm-modal-title {
+            color: #1a3b4f;
+            font-size: 1.18rem;
+            line-height: 1.2;
+            font-weight: 950;
+            letter-spacing: -0.02em;
+        }
+
+        .confirm-modal-close {
+            flex: 0 0 auto;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 50%;
+            background: #f4f9ff;
+            color: #607584;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.16s ease;
+        }
+
+        .confirm-modal-close:hover {
+            background: #e6f0f8;
+            color: #1e4663;
+        }
+
+        .confirm-modal-text {
+            color: #496273;
+            font-size: 0.95rem;
+            line-height: 1.48;
+            font-weight: 750;
+            margin-bottom: 0.9rem;
+        }
+
+        .confirm-modal-warning {
+            background: rgba(253, 236, 234, 0.92);
+            border: 1px solid rgba(201, 74, 74, 0.22);
+            color: #9f3434;
+            border-radius: 1.15rem;
+            padding: 0.85rem 0.9rem;
+            font-size: 0.86rem;
+            line-height: 1.42;
+            font-weight: 800;
+            margin-bottom: 0.95rem;
+        }
+
+        .confirm-checkbox-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            background: rgba(244, 249, 255, 0.8);
+            border: 1px solid #d9e5ee;
+            border-radius: 1.05rem;
+            padding: 0.85rem 0.9rem;
+            color: #1a3b4f;
+            font-size: 0.88rem;
+            line-height: 1.38;
+            font-weight: 850;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .confirm-checkbox-row input {
+            flex: 0 0 auto;
+            width: 18px;
+            height: 18px;
+            margin-top: 0.05rem;
+            cursor: pointer;
+            accent-color: #c94a4a;
+        }
+
+        .confirm-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.7rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .confirm-action-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 0.72rem 1rem;
+            font-family: inherit;
+            font-size: 0.86rem;
+            font-weight: 950;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .confirm-cancel-btn {
+            background: #eef3fc;
+            color: #2c5f8a;
+            border: 1px solid #cbdbe2;
+        }
+
+        .confirm-cancel-btn:hover {
+            background: #dfeaf7;
+        }
+
+        .confirm-delete-btn {
+            background: #c94a4a;
+            color: #ffffff;
+            box-shadow: 0 12px 22px -16px rgba(201, 74, 74, 0.95);
+        }
+
+        .confirm-delete-btn:hover:not(:disabled) {
+            background: #ad3e3e;
+            transform: scale(0.98);
+        }
+
+        .confirm-delete-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 1.2rem;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 2000;
+            background: rgba(30, 43, 60, 0.94);
+            color: #ffffff;
+            border-radius: 999px;
+            padding: 0.75rem 1.15rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            box-shadow: 0 18px 34px -20px rgba(18, 40, 60, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .footer-note {
+            color: #718493;
+            text-align: center;
+            font-size: 0.74rem;
+            margin-top: 0.85rem;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+
+        @media (max-width: 980px) {
+            h1 {
+                text-align: left;
+                margin-bottom: 0.7rem;
+            }
+
+            .summary-row {
+                grid-template-columns: 1fr;
+            }
+
+            .link-card-main {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .created-date {
+                white-space: normal;
+            }
+        }
+
+        @media (max-width: 620px) {
+            body {
+                padding: 0.65rem;
+            }
+
+            .top-bar {
+                align-items: flex-start;
+                gap: 0.55rem;
+            }
+
+            .top-bar-left,
+            .top-bar-right {
+                gap: 0.45rem;
+            }
+
+            .back-button {
+                padding: 0.62rem 0.78rem;
+            }
+
+            .back-button span {
+                display: none;
+            }
+
+            .organizer-pill {
+                font-size: 0.76rem;
+                padding: 0.52rem 0.7rem;
+            }
+
+
+            .profile-button {
+                width: 42px;
+                height: 42px;
+            }
+
+            .profile-dropdown {
+                width: min(250px, calc(100vw - 1.3rem));
+                right: 0;
+            }
+
+            .main-card {
+                padding: 1.35rem 1rem;
+                border-radius: 1.8rem;
+            }
+
+            h1 {
+                font-size: clamp(1.85rem, 11vw, 2.45rem);
+            }
+
+            .links-area {
+                padding: 0.75rem;
+                border-radius: 1.35rem;
+            }
+
+            .links-toolbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .refresh-btn {
+                width: 100%;
+            }
+
+            .link-copy-row {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .short-link {
+                border-radius: 1rem;
+            }
+
+            .copy-btn {
+                width: 42px;
+                height: 42px;
+                align-self: flex-end;
+            }
+
+
+            .card-actions-row {
+                grid-template-columns: 1fr;
+            }
+
+            .delete-btn {
+                width: 42px;
+                height: 42px;
+                justify-self: flex-end;
+            }
+
+            .confirm-modal-actions {
+                flex-direction: column-reverse;
+            }
+
+            .confirm-action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <script src="js/cloud.js?v=6"></script>
+</head>
+
+<body>
+<script>
+    (function createParticles() {
+        const count = 42;
+
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+
+            const size = Math.random() * 7 + 2;
+
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = Math.random() * 10 + 7 + 's';
+            p.style.animationDelay = Math.random() * -25 + 's';
+            p.style.opacity = Math.random() * 0.3 + 0.08;
+
+            document.body.appendChild(p);
+        }
+    })();
+</script>
+
+<main class="page-shell">
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <button class="back-button" id="backButton" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Назад</span>
+            </button>
+        </div>
+
+        <div class="top-bar-right">
+            <div class="organizer-pill">📋 Турнирные ссылки</div>
+
+            <div class="profile-menu" id="profileMenu">
+                <button class="profile-button" id="profileButton" type="button" aria-label="Меню профиля">
+                    <span class="profile-avatar" id="profileAvatar">👤</span>
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="profile-head">
+                        <div class="profile-name" id="profileName">Организатор</div>
+                        <div class="profile-login" id="profileLogin">Загрузка...</div>
+                    </div>
+
+                    <button class="profile-menu-item" id="organizerPanelBtn" type="button">
+                        🧩 Панель организатора
+                    </button>
+
+                    <button class="profile-menu-item logout" id="logoutBtn" type="button">
+                        🚪 Выйти
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="main-card">
+        <div class="card-content">
+            <header class="page-head">
+                <h1>Турнирные ссылки</h1>
+
+                <p class="lead-text">
+                    Здесь будут собраны все Ваши ссылки на созданные турниры.
+                </p>
+            </header>
+
+            <section class="summary-row" aria-label="Сводка по ссылкам">
+                <div class="summary-card">
+                    <div class="summary-title">Всего ссылок</div>
+                    <div class="summary-value" id="totalCount">0</div>
+                </div>
+            </section>
+
+            <section class="links-area">
+                <div class="links-toolbar">
+                    <div>
+                        <div class="links-title" id="linksTitle">Список ссылок</div>
+                        <div class="links-subtitle" id="linksSubtitle">
+                            Отображаются Ваши созданные турнирные ссылки.
+                        </div>
+                    </div>
+
+                    <button class="refresh-btn" id="refreshBtn" type="button">↻ Обновить</button>
+                </div>
+
+                <div class="links-list" id="linksList"></div>
+            </section>
+        </div>
+    </section>
+
+    <footer class="footer-note">
+        © 2026 viaVUCA® · Организатор турниров
+    </footer>
+</main>
+
+<div class="toast" id="toast">Ссылка скопирована</div>
+
+<div class="confirm-modal-overlay" id="deleteConfirmModal" aria-hidden="true">
+    <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+        <div class="confirm-modal-head">
+            <div class="confirm-modal-title" id="deleteConfirmTitle">Удаление турнира</div>
+            <button class="confirm-modal-close" id="deleteModalCloseBtn" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <div class="confirm-modal-text">
+            Вы действительно хотите удалить все данные об этом турнире?
+        </div>
+
+        <div class="confirm-modal-warning">
+            Будет удалена строка турнира из списка ссылок и таблица турнира на Google Диске. Это действие нельзя отменить через интерфейс платформы.
+        </div>
+
+        <label class="confirm-checkbox-row">
+            <input type="checkbox" id="deleteConfirmCheckbox">
+            <span>Я понимаю, что данные об этом турнире будут удалены.</span>
+        </label>
+
+        <div class="confirm-modal-actions">
+            <button class="confirm-action-btn confirm-cancel-btn" id="deleteCancelBtn" type="button">Отмена</button>
+            <button class="confirm-action-btn confirm-delete-btn" id="deleteConfirmBtn" type="button" disabled>Удалить турнир</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const USE_DEMO_DATA_UNTIL_CLOUD_INTEGRATION = false;
+
+    const demoTournamentLinks = [
+        {
+            id: 'test_alq_8f31',
+            organizerName: sessionStorage.getItem('organizerName') || 'Анна Сергеева',
+            organizerLogin: sessionStorage.getItem('organizerLogin') || 'anna@school.ru',
+            createdAt: '2026-05-08T10:30:00',
+            url: `${window.location.origin}${window.location.pathname.replace('organizer_links.html', '')}test_auth.html?testId=test_alq_8f31`,
+            games: ['Алькерк'],
+            gameTitle: 'Алькерк',
+            mode: 'single',
+            title: 'Турнир Алькерк',
+            tasksCount: 12,
+            settings: 'Захваты, лучший ход, оценка позиции'
+        },
+        {
+            id: 'test_mix_27d4',
+            organizerName: 'Иван Петров',
+            organizerLogin: 'ivan@school.ru',
+            createdAt: '2026-05-07T16:45:00',
+            url: `${window.location.origin}${window.location.pathname.replace('organizer_links.html', '')}test_auth.html?testId=test_mix_27d4`,
+            games: ['Алькерк', 'Фанорона', 'Реверси'],
+            gameTitle: 'Алькерк, Фанорона, Реверси',
+            mode: 'mixed',
+            title: 'Сборный тест: Алькерк, Фанорона, Реверси',
+            tasksCount: 18,
+            settings: 'Сборный тест, случайный порядок задач'
+        },
+        {
+            id: 'test_rev_91ac',
+            organizerName: 'Мария Волкова',
+            organizerLogin: 'maria@school.ru',
+            createdAt: '2026-05-06T12:10:00',
+            url: `${window.location.origin}${window.location.pathname.replace('organizer_links.html', '')}test_auth.html?testId=test_rev_91ac`,
+            games: ['Реверси'],
+            gameTitle: 'Реверси',
+            mode: 'single',
+            title: 'Турнир Реверси',
+            tasksCount: 10,
+            settings: 'Поиск лучшего хода, оценка переворотов'
+        }
+    ];
+
+    let tournamentLinks = [];
+
+    const linksList = document.getElementById('linksList');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const linksTitle = document.getElementById('linksTitle');
+    const linksSubtitle = document.getElementById('linksSubtitle');
+    const totalCount = document.getElementById('totalCount');
+    const toast = document.getElementById('toast');
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const deleteConfirmCheckbox = document.getElementById('deleteConfirmCheckbox');
+    const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+    const deleteCancelBtn = document.getElementById('deleteCancelBtn');
+    const deleteModalCloseBtn = document.getElementById('deleteModalCloseBtn');
+    let pendingDeleteTestId = '';
+
+    function getCurrentOrganizer() {
+        return {
+            name: sessionStorage.getItem('organizerName') || '',
+            login: sessionStorage.getItem('organizerLogin') || ''
+        };
+    }
+
+    function normalizeText(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function isMine(link) {
+        const organizer = getCurrentOrganizer();
+        const currentLogin = normalizeText(organizer.login);
+        const currentName = normalizeText(organizer.name);
+        const linkLogin = normalizeText(link.organizerLogin);
+        const linkName = normalizeText(link.organizerName);
+
+        if (currentLogin && linkLogin) return currentLogin === linkLogin;
+        if (currentName && linkName) return currentName === linkName;
+
+        return false;
+    }
+
+    function formatDate(value) {
+        if (!value) return 'Дата не указана';
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return value;
+        }
+
+        return date.toLocaleString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function shortenUrl(url) {
+        const text = String(url || '');
+
+        if (text.length <= 42) return text;
+
+        return text.slice(0, 22) + '…' + text.slice(-16);
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function buildTournamentTitle(link) {
+        if (link && link.title) {
+            return String(link.title);
+        }
+
+        const mode = String((link && link.mode) || '').trim().toLowerCase();
+        const games = Array.isArray(link && link.games)
+            ? link.games.map(item => String(item || '').trim()).filter(Boolean)
+            : [];
+        const gameTitle = String((link && link.gameTitle) || '').trim();
+
+        if (mode === 'mixed' || games.length > 1) {
+            if (gameTitle) return `Сборный тест: ${gameTitle}`;
+            if (games.length) return `Сборный тест: ${games.join(', ')}`;
+            return 'Сборный тест';
+        }
+
+        const singleTitle = gameTitle || games[0] || '';
+        return singleTitle ? `Турнир ${singleTitle}` : 'Турнир';
+    }
+
+    function parseSettingsDetails(details) {
+        if (!details) return null;
+
+        if (typeof details === 'object') return details;
+
+        const text = String(details || '').trim();
+
+        if (!text) return null;
+
+        try {
+            return JSON.parse(text);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function renderSettingsDetailsReport(link, fallback) {
+        const details = parseSettingsDetails(link.settingsDetails || link.settingsDetailsJson || null);
+
+        if (!details) {
+            return `
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-title">Выбранные игры</div>
+                        <div class="detail-value">${escapeHtml(fallback.gamesText)}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-title">Количество задач</div>
+                        <div class="detail-value">${escapeHtml(fallback.tasksText)}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-title">Настройки ссылки</div>
+                        <div class="detail-value">${escapeHtml(fallback.settingsText)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const mode = String(details.mode || link.mode || '').trim().toLowerCase();
+        const gameName = details.gameName || (mode === 'mixed' ? 'Сборный тест' : (link.gameTitle || 'Игра'));
+        const totalTasks = details.totalTasks !== undefined && details.totalTasks !== null && String(details.totalTasks) !== ''
+            ? details.totalTasks
+            : (link.tasksCount || 'Не указано');
+        const orderText = details.order || (link.shuffle ? 'В случайном порядке' : 'По порядку');
+
+        if (mode === 'mixed') {
+            const games = Array.isArray(details.games) ? details.games : [];
+            const gamesHtml = games.length
+                ? games.map(game => {
+                    const tasks = Array.isArray(game.tasks) ? game.tasks : [];
+                    const tasksText = tasks.length
+                        ? tasks.map(task => `${escapeHtml(task.title || task.name || 'Задача')}: ${escapeHtml(task.count ?? '')}`).join(', ')
+                        : 'Задачи не указаны';
+
+                    return `
+                        <div class="settings-game-block">
+                            <div class="settings-game-name">${escapeHtml(game.name || 'Игра')}</div>
+                            <div class="settings-inline-tasks">${tasksText}</div>
+                        </div>
+                    `;
+                }).join('')
+                : `<div class="settings-game-block"><div class="settings-inline-tasks">Выбранные игры не указаны</div></div>`;
+
+            return `
+                <div class="settings-report">
+                    <div class="settings-report-row">
+                        <span class="settings-report-label">Игра:</span>
+                        <span class="settings-report-value">${escapeHtml(gameName)}</span>
+                    </div>
+
+                    <div class="settings-report-section-title">Выбранные игры и типы:</div>
+                    <div class="settings-task-list">${gamesHtml}</div>
+
+                    <div class="settings-report-row">
+                        <span class="settings-report-label">Всего задач:</span>
+                        <span class="settings-report-value">${escapeHtml(totalTasks)}</span>
+                    </div>
+
+                    <div class="settings-report-row">
+                        <span class="settings-report-label">Порядок:</span>
+                        <span class="settings-report-value">${escapeHtml(orderText)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        const tasks = Array.isArray(details.tasks) ? details.tasks : [];
+        const tasksHtml = tasks.length
+            ? tasks.map(task => `
+                <div class="settings-task-item">
+                    <div class="settings-task-name">${escapeHtml(task.title || task.name || 'Задача')}</div>
+                    <div class="settings-task-count">${escapeHtml(task.count ?? '')}</div>
+                </div>
+            `).join('')
+            : `<div class="settings-task-item"><div class="settings-task-name">Типы задач не указаны</div></div>`;
+
+        return `
+            <div class="settings-report">
+                <div class="settings-report-row">
+                    <span class="settings-report-label">Игра:</span>
+                    <span class="settings-report-value">${escapeHtml(gameName)}</span>
+                </div>
+
+                <div class="settings-report-section-title">Выбранные типы задач:</div>
+                <div class="settings-task-list">${tasksHtml}</div>
+
+                <div class="settings-report-row">
+                    <span class="settings-report-label">Всего задач:</span>
+                    <span class="settings-report-value">${escapeHtml(totalTasks)}</span>
+                </div>
+
+                <div class="settings-report-row">
+                    <span class="settings-report-label">Порядок:</span>
+                    <span class="settings-report-value">${escapeHtml(orderText)}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 1800);
+    }
+
+    async function copyText(text) {
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                const temp = document.createElement('textarea');
+                temp.value = text;
+                temp.style.position = 'fixed';
+                temp.style.left = '-9999px';
+                document.body.appendChild(temp);
+                temp.focus();
+                temp.select();
+                document.execCommand('copy');
+                temp.remove();
+            }
+
+            showToast('Ссылка скопирована');
+        } catch (error) {
+            console.error('Не удалось скопировать ссылку:', error);
+            showToast('Не удалось скопировать ссылку');
+        }
+    }
+
+    async function loadTournamentLinksFromCloud() {
+        if (typeof window.loadOrganizerTournamentLinks !== 'function') {
+            throw new Error('Функция загрузки турнирных ссылок не подключена');
+        }
+
+        return await window.loadOrganizerTournamentLinks();
+    }
+
+    async function saveTournamentTitleToCloud(testId, title) {
+        if (typeof window.updateTournamentTitle === 'function') {
+            return await window.updateTournamentTitle(testId, title);
+        }
+
+        if (typeof SCRIPT_URL === 'undefined') {
+            throw new Error('SCRIPT_URL не подключён');
+        }
+
+        const organizerLogin =
+            sessionStorage.getItem('organizerLogin') ||
+            localStorage.getItem('organizerLogin') ||
+            '';
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'updateTournamentTitle',
+                testId,
+                title,
+                organizerLogin
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Не удалось обновить название');
+        }
+
+        return data;
+    }
+
+
+    async function deleteTournamentFromCloud(testId) {
+        if (!testId) {
+            throw new Error('testId не передан');
+        }
+
+        if (typeof SCRIPT_URL === 'undefined') {
+            throw new Error('SCRIPT_URL не подключён');
+        }
+
+        const organizerLogin =
+            sessionStorage.getItem('organizerLogin') ||
+            localStorage.getItem('organizerLogin') ||
+            '';
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'deleteTournamentFully',
+                testId,
+                organizerLogin
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Не удалось удалить турнир');
+        }
+
+        return data;
+    }
+
+    function openDeleteConfirmModal(testId) {
+        const link = tournamentLinks.find(item => String(item.testId || item.id || '') === String(testId));
+
+        if (!link) {
+            showToast('Ссылка не найдена');
+            return;
+        }
+
+        pendingDeleteTestId = String(testId || '');
+        deleteConfirmCheckbox.checked = false;
+        deleteConfirmBtn.disabled = true;
+        deleteConfirmBtn.textContent = 'Удалить турнир';
+        deleteConfirmModal.classList.add('open');
+        deleteConfirmModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeDeleteConfirmModal() {
+        pendingDeleteTestId = '';
+        deleteConfirmCheckbox.checked = false;
+        deleteConfirmBtn.disabled = true;
+        deleteConfirmBtn.textContent = 'Удалить турнир';
+        deleteConfirmModal.classList.remove('open');
+        deleteConfirmModal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function confirmDeleteTournament() {
+        if (!pendingDeleteTestId || !deleteConfirmCheckbox.checked) {
+            return;
+        }
+
+        const testId = pendingDeleteTestId;
+
+        deleteConfirmBtn.disabled = true;
+        deleteConfirmBtn.textContent = 'Удаление...';
+
+        try {
+            await deleteTournamentFromCloud(testId);
+
+            tournamentLinks = tournamentLinks.filter(item => String(item.testId || item.id || '') !== String(testId));
+            closeDeleteConfirmModal();
+            renderLinks();
+            showToast('Турнир удалён');
+        } catch (error) {
+            console.error('Не удалось удалить турнир:', error);
+            deleteConfirmBtn.disabled = false;
+            deleteConfirmBtn.textContent = 'Удалить турнир';
+            showToast(error.message || 'Не удалось удалить турнир');
+        }
+    }
+
+    function updateSummary(visibleLinks) {
+        totalCount.textContent = visibleLinks.length;
+    }
+
+    function getVisibleLinks() {
+        // Сервер уже возвращает только ссылки текущего организатора.
+        return tournamentLinks;
+    }
+
+    function renderEmptyState() {
+        linksList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">У вас пока нет созданных ссылок</div>
+                <div class="empty-text">Когда Вы создадите турнирную ссылку, она появится здесь.</div>
+            </div>
+        `;
+    }
+
+    function renderLoadingState() {
+        linksList.innerHTML = `
+            <div class="loading-state">
+                <div class="loading-refresh-icon">↻</div>
+                <div class="loading-title">Загружаем данные</div>
+                <div class="loading-text">Пожалуйста, подождите. Список турнирных ссылок обновляется.</div>
+            </div>
+        `;
+    }
+
+    function renderLinks() {
+        const visibleLinks = getVisibleLinks().sort((a, b) => {
+            const dateA = new Date(a.createdAt || 0).getTime();
+            const dateB = new Date(b.createdAt || 0).getTime();
+            return dateB - dateA;
+        });
+
+        linksTitle.textContent = 'Список ссылок';
+        linksSubtitle.textContent = 'Отображаются Ваши созданные турнирные ссылки.';
+
+        updateSummary(visibleLinks);
+
+        if (!visibleLinks.length) {
+            renderEmptyState();
+            return;
+        }
+
+        linksList.innerHTML = visibleLinks.map(link => {
+            const games = Array.isArray(link.games) ? link.games : [];
+            const gamesText = games.length ? games.join(', ') : (link.gameTitle || 'Не указано');
+            const settingsText = link.settings || link.settingsSummary || 'Параметры будут подтягиваться из таблицы позже';
+            const tasksText = link.tasksCount ? `${link.tasksCount} заданий` : 'Не указано';
+            const tournamentTitle = buildTournamentTitle(link);
+            const safeUrl = escapeHtml(link.url || '');
+
+            return `
+                <article class="link-card" data-link-id="${escapeHtml(link.id)}">
+                    <div class="link-card-main">
+                        <div>
+                            <div class="tournament-title-row">
+                                <div class="tournament-card-title">${escapeHtml(tournamentTitle)}</div>
+                                <button class="title-edit-btn" type="button" data-edit-title-id="${escapeHtml(link.testId || link.id)}" title="Изменить название" aria-label="Изменить название">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 20h9"></path>
+                                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="created-by-label">Организатор</div>
+                            <div class="organizer-name">${escapeHtml(link.organizerName || 'Организатор не указан')}</div>
+                        </div>
+
+                        <div>
+                            <div class="link-label">Турнирная ссылка</div>
+                            <div class="link-copy-row">
+                                <div class="short-link" title="${safeUrl}">${escapeHtml(shortenUrl(link.url))}</div>
+                                <button class="copy-btn" type="button" data-copy-url="${safeUrl}" title="Скопировать ссылку" aria-label="Скопировать ссылку">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="created-date-label">Дата создания</div>
+                            <div class="created-date">${escapeHtml(formatDate(link.createdAt))}</div>
+                        </div>
+                    </div>
+
+                    <div class="details-panel">
+                        ${renderSettingsDetailsReport(link, { gamesText, tasksText, settingsText })}
+                    </div>
+
+                    <div class="card-actions-row">
+                        <button class="details-btn" type="button">
+                            Параметры ссылки <span class="details-arrow">▼</span>
+                        </button>
+
+                        <button class="delete-btn" type="button" data-delete-id="${escapeHtml(link.testId || link.id)}" title="Удалить турнир" aria-label="Удалить турнир">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                                <path d="M10 11v6"></path>
+                                <path d="M14 11v6"></path>
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    async function editTournamentTitle(testId) {
+        const link = tournamentLinks.find(item => String(item.testId || item.id || '') === String(testId));
+
+        if (!link) {
+            showToast('Ссылка не найдена');
+            return;
+        }
+
+        const currentTitle = buildTournamentTitle(link);
+        const newTitle = prompt('Введите новое название турнира:', currentTitle);
+
+        if (newTitle === null) return;
+
+        const cleanTitle = String(newTitle || '').trim();
+
+        if (!cleanTitle) {
+            showToast('Название не может быть пустым');
+            return;
+        }
+
+        if (cleanTitle.length > 120) {
+            showToast('Название слишком длинное');
+            return;
+        }
+
+        try {
+            await saveTournamentTitleToCloud(testId, cleanTitle);
+
+            link.title = cleanTitle;
+            renderLinks();
+            showToast('Название обновлено');
+        } catch (error) {
+            console.error('Не удалось обновить название:', error);
+            showToast(error.message || 'Не удалось обновить название');
+        }
+    }
+
+    async function refreshLinks() {
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = 'Загрузка...';
+        renderLoadingState();
+
+        try {
+            const links = await loadTournamentLinksFromCloud();
+            tournamentLinks = Array.isArray(links) ? links : [];
+            renderLinks();
+        } catch (error) {
+            console.error('Ошибка загрузки турнирных ссылок:', error);
+            tournamentLinks = [];
+            renderLinks();
+            showToast('Не удалось загрузить ссылки');
+        } finally {
+            refreshBtn.disabled = false;
+            refreshBtn.textContent = '↻ Обновить';
+        }
+    }
+
+
+
+    function getInitials(nameOrLogin) {
+        const raw = String(nameOrLogin || '').trim();
+
+        if (!raw) return '👤';
+
+        const parts = raw.split(/\s+/).filter(Boolean);
+
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+
+        if (raw.includes('@')) {
+            return raw[0].toUpperCase();
+        }
+
+        return raw.slice(0, 2).toUpperCase();
+    }
+
+    function restoreOrganizerAuthFromLocalStorage() {
+        const sessionAuth = sessionStorage.getItem('organizerAuth') === 'true';
+        const sessionLogin = sessionStorage.getItem('organizerLogin');
+
+        if (sessionAuth && sessionLogin) {
+            return;
+        }
+
+        const rememberedAuth = localStorage.getItem('organizerAuth') === 'true';
+        const rememberedLogin = localStorage.getItem('organizerLogin') || '';
+
+        if (rememberedAuth && rememberedLogin) {
+            sessionStorage.setItem('organizerAuth', 'true');
+            sessionStorage.setItem('organizerLogin', rememberedLogin);
+        }
+    }
+
+    function setupProfileMenu() {
+        const profileMenu = document.getElementById('profileMenu');
+        const profileButton = document.getElementById('profileButton');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const organizerPanelBtn = document.getElementById('organizerPanelBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        if (!profileMenu || !profileButton || !profileDropdown) return;
+
+        profileButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            profileDropdown.classList.toggle('open');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!profileMenu.contains(event.target)) {
+                profileDropdown.classList.remove('open');
+            }
+        });
+
+        organizerPanelBtn.addEventListener('click', () => {
+            window.location.href = 'organizer.html';
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('organizerAuth');
+            sessionStorage.removeItem('organizerLogin');
+            sessionStorage.removeItem('organizerName');
+            sessionStorage.removeItem('organizerEmail');
+            sessionStorage.removeItem('organizerRole');
+            sessionStorage.removeItem('organizerId');
+
+            localStorage.removeItem('organizerRemember');
+            localStorage.removeItem('organizerAuth');
+            localStorage.removeItem('organizerLogin');
+            localStorage.removeItem('rememberOrganizerLogin');
+            localStorage.removeItem('rememberOrganizerLoginValue');
+
+            window.location.href = 'organizer_login.html';
+        });
+    }
+
+    async function loadOrganizerProfileToMenu() {
+        restoreOrganizerAuthFromLocalStorage();
+
+        const login = sessionStorage.getItem('organizerLogin') || localStorage.getItem('organizerLogin') || '';
+        const cachedName = sessionStorage.getItem('organizerName') || '';
+        const cachedEmail = sessionStorage.getItem('organizerEmail') || '';
+
+        const nameEl = document.getElementById('profileName');
+        const loginEl = document.getElementById('profileLogin');
+        const avatarEl = document.getElementById('profileAvatar');
+
+        if (!nameEl || !loginEl || !avatarEl) return;
+
+        if (!login) {
+            nameEl.textContent = 'Организатор';
+            loginEl.textContent = 'Вход не определён';
+            avatarEl.textContent = '👤';
+            return;
+        }
+
+        if (cachedName || cachedEmail) {
+            const displayName = cachedName || login;
+            const displayEmail = cachedEmail || login;
+
+            nameEl.textContent = displayName;
+            loginEl.textContent = displayEmail;
+            avatarEl.textContent = getInitials(displayName);
+            return;
+        }
+
+        nameEl.textContent = 'Загрузка профиля...';
+        loginEl.textContent = login;
+        avatarEl.textContent = getInitials(login);
+
+        if (typeof getOrganizerProfile !== 'function') {
+            nameEl.textContent = login;
+            loginEl.textContent = 'Функция профиля не подключена';
+            avatarEl.textContent = getInitials(login);
+            return;
+        }
+
+        try {
+            const profile = await getOrganizerProfile(login);
+
+            const fullName = profile && profile.name
+                ? profile.name
+                : login;
+
+            const profileLogin = profile && profile.login
+                ? profile.login
+                : login;
+
+            const profileEmail = profile && profile.email
+                ? profile.email
+                : profileLogin;
+
+            nameEl.textContent = fullName;
+            loginEl.textContent = profileEmail;
+            avatarEl.textContent = getInitials(fullName);
+
+            sessionStorage.setItem('organizerAuth', 'true');
+            sessionStorage.setItem('organizerLogin', profileLogin);
+            sessionStorage.setItem('organizerName', fullName);
+            sessionStorage.setItem('organizerEmail', profileEmail);
+
+            if (profile && profile.role) {
+                sessionStorage.setItem('organizerRole', profile.role);
+            }
+
+            if (profile && profile.organizerId) {
+                sessionStorage.setItem('organizerId', profile.organizerId);
+            }
+        } catch (error) {
+            console.warn('Не удалось загрузить профиль организатора:', error);
+
+            nameEl.textContent = login;
+            loginEl.textContent = 'Данные профиля не загружены';
+            avatarEl.textContent = getInitials(login);
+        }
+    }
+
+    document.getElementById('backButton').addEventListener('click', () => {
+        window.location.href = 'organizer.html';
+    });
+
+    refreshBtn.addEventListener('click', refreshLinks);
+
+    linksList.addEventListener('click', async (event) => {
+        const copyBtn = event.target.closest('.copy-btn');
+        const detailsBtn = event.target.closest('.details-btn');
+        const titleEditBtn = event.target.closest('.title-edit-btn');
+        const deleteBtn = event.target.closest('.delete-btn');
+
+        if (deleteBtn) {
+            openDeleteConfirmModal(deleteBtn.dataset.deleteId || '');
+            return;
+        }
+
+        if (titleEditBtn) {
+            await editTournamentTitle(titleEditBtn.dataset.editTitleId || '');
+            return;
+        }
+
+        if (copyBtn) {
+            await copyText(copyBtn.dataset.copyUrl || '');
+            copyBtn.classList.add('copied');
+            setTimeout(() => copyBtn.classList.remove('copied'), 900);
+            return;
+        }
+
+        if (detailsBtn) {
+            const card = detailsBtn.closest('.link-card');
+            card.classList.toggle('open');
+        }
+    });
+
+
+    deleteConfirmCheckbox.addEventListener('change', () => {
+        deleteConfirmBtn.disabled = !deleteConfirmCheckbox.checked;
+    });
+
+    deleteConfirmBtn.addEventListener('click', confirmDeleteTournament);
+    deleteCancelBtn.addEventListener('click', closeDeleteConfirmModal);
+    deleteModalCloseBtn.addEventListener('click', closeDeleteConfirmModal);
+
+    deleteConfirmModal.addEventListener('click', (event) => {
+        if (event.target === deleteConfirmModal) {
+            closeDeleteConfirmModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && deleteConfirmModal.classList.contains('open')) {
+            closeDeleteConfirmModal();
+        }
+    });
+
+    setupProfileMenu();
+    loadOrganizerProfileToMenu();
+    refreshLinks();
+</script>
+
+</body>
+</html>

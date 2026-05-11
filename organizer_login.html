@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Вход · viaVuca</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.86), transparent 34%),
+                radial-gradient(circle at bottom right, rgba(125, 158, 190, 0.24), transparent 38%),
+                linear-gradient(145deg, #e0eaf4 0%, #cfdef3 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            color: #1e2b3c;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .login-container {
+            max-width: 480px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            box-shadow: 0 24px 55px -22px rgba(18, 40, 60, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            overflow: hidden;
+            animation: fadeUp 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.05) forwards;
+            opacity: 0;
+            transform: translateY(18px);
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            padding: 2rem 2rem 1rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e0eaf4;
+        }
+
+        .logo {
+            width: 150px;
+            max-width: 70%;
+            height: auto;
+            display: block;
+            margin: 0 auto 0.8rem;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            background: linear-gradient(135deg, #172637, #2a4a6e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            line-height: 1.12;
+        }
+
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .mode-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #8ba0b5;
+            cursor: pointer;
+            transition: 0.2s;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            font-family: inherit;
+            white-space: nowrap;
+            box-shadow: none;
+        }
+
+        .mode-btn.active {
+            color: #2c7a47;
+            border-bottom-color: #2c7a47;
+            background: none;
+            box-shadow: none;
+        }
+
+        .mode-btn:hover {
+            color: #2c5f8a;
+            background: none;
+            box-shadow: none;
+        }
+
+        .login-form {
+            padding: 2rem 2rem 0.8rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1.3rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1a3b4f;
+            margin-bottom: 0.45rem;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            padding: 0.82rem 1rem;
+            border: 1px solid #d9e5ee;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a3b4f;
+            box-shadow:
+                0 8px 20px -18px rgba(18, 40, 60, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.92);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input::placeholder {
+            color: #8ba0b5;
+            font-weight: 400;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus {
+            border-color: #9fb7c8;
+            box-shadow:
+                0 0 0 3px rgba(44, 95, 138, 0.16),
+                0 8px 20px -18px rgba(18, 40, 60, 0.45);
+            background: #ffffff;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 3.2rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 0.85rem;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1.05rem;
+            line-height: 1;
+            color: #6b7f8d;
+            padding: 0;
+            transition: all 0.2s ease;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+        }
+
+        .password-toggle:hover {
+            color: #2c5f8a;
+            background: rgba(244, 249, 255, 0.9);
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.55rem;
+            margin: -0.35rem 0 1.25rem;
+            color: #5a6e7c;
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            text-align: left;
+        }
+
+        .remember-row input {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+            accent-color: #2c7a47;
+        }
+
+        button[type="submit"] {
+            width: auto;
+            min-width: 145px;
+            background: #2c7a47;
+            border: none;
+            padding: 0.78rem 1.45rem;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 0.25rem auto 0;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            box-shadow: 0 12px 22px -16px rgba(18, 40, 60, 0.65);
+        }
+
+        button[type="submit"]:hover:not(:disabled) {
+            background: #1f5f36;
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 14px 26px -18px rgba(18, 40, 60, 0.8);
+        }
+
+        button[type="submit"]:disabled {
+            background: #9bb59b;
+            cursor: not-allowed;
+            opacity: 0.75;
+            transform: none;
+        }
+
+        .secondary-action {
+            margin-top: 1.2rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .message {
+            margin-top: 1rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            text-align: center;
+            background: rgba(244, 249, 255, 0.92);
+            color: #2c3e4e;
+            font-weight: 700;
+            line-height: 1.35;
+            border: 1px solid #d9e5ee;
+        }
+
+        .message.error {
+            background: rgba(254, 226, 226, 0.88);
+            color: #b91c1c;
+            border-color: rgba(239, 83, 80, 0.32);
+        }
+
+        .message.success {
+            background: rgba(224, 242, 231, 0.9);
+            color: #166534;
+            border-color: rgba(44, 122, 71, 0.25);
+        }
+
+        .timer {
+            display: inline-block;
+            font-weight: 800;
+            color: #2c5f8a;
+        }
+
+        .resend-link {
+            background: none;
+            border: none;
+            color: #2c5f8a;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .resend-link:hover:not(:disabled) {
+            color: #1e4663;
+            text-decoration: underline;
+        }
+
+        .resend-link:disabled {
+            color: #9bb59b;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .bottom-link-wrap {
+            text-align: center;
+            padding: 0.2rem 2rem 1.7rem;
+        }
+
+        .bottom-back-link {
+            display: inline-block;
+            color: #5a6e7c;
+            text-decoration: none;
+            font-size: 0.86rem;
+            font-weight: 700;
+            transition: color 0.2s ease;
+        }
+
+        .bottom-back-link:hover {
+            color: #1e4663;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 0.8rem;
+            }
+
+            .login-container {
+                border-radius: 1.7rem;
+            }
+
+            .login-header {
+                padding: 1.75rem 1.2rem 0.9rem;
+            }
+
+            .logo {
+                width: 135px;
+            }
+
+            h1 {
+                font-size: 1.45rem;
+            }
+
+            .login-form {
+                padding: 1.5rem 1.2rem 0.7rem;
+            }
+
+            .mode-switch {
+                gap: 1.2rem;
+            }
+
+            .mode-btn {
+                font-size: 0.85rem;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            input[type="email"] {
+                font-size: 0.95rem;
+                padding: 0.75rem 0.9rem;
+            }
+
+            button[type="submit"] {
+                min-width: 135px;
+                padding: 0.72rem 1.25rem;
+                font-size: 0.95rem;
+            }
+
+            .bottom-link-wrap {
+                padding: 0.1rem 1.2rem 1.45rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .mode-switch {
+                gap: 0.8rem;
+            }
+
+            .mode-btn {
+                font-size: 0.78rem;
+            }
+        }
+    </style>
+
+    <script src="js/cloud.js?v=6"></script>
+</head>
+
+<body>
+<div class="login-container">
+    <div class="login-header">
+        <img src="logo/logo.svg" alt="viaVuca" class="logo">
+
+        <h1>Вход организатора</h1>
+
+        <div class="mode-switch">
+            <button class="mode-btn active" data-mode="password">🔐 По паролю</button>
+            <button class="mode-btn" data-mode="code">📧 По коду из почты</button>
+        </div>
+    </div>
+
+    <!-- Форма входа по паролю -->
+    <div id="password-form" class="login-form">
+        <div class="input-group">
+            <label>Логин</label>
+            <input type="text" id="login" name="username" placeholder="Введите логин" autocomplete="username">
+        </div>
+
+        <div class="input-group">
+            <label>Пароль</label>
+
+            <div class="password-wrapper">
+                <input type="password" id="password" name="password" placeholder="Введите пароль" autocomplete="current-password">
+                <button type="button" class="password-toggle" id="password-toggle" aria-label="Показать пароль">
+                    👁️
+                </button>
+            </div>
+        </div>
+
+        <label class="remember-row">
+            <input type="checkbox" id="rememberMe">
+            <span>Запомнить меня</span>
+        </label>
+
+        <button type="submit" id="password-submit">Войти</button>
+
+        <div id="password-message" class="message" style="display: none;"></div>
+    </div>
+
+    <!-- Форма входа по коду -->
+    <div id="code-form" class="login-form" style="display: none;">
+        <div id="email-step">
+            <div class="input-group">
+                <label>Email организатора</label>
+                <input type="email" id="email" placeholder="example@school.ru" autocomplete="email">
+            </div>
+
+            <button type="submit" id="send-code-btn">Отправить код</button>
+
+            <div id="email-message" class="message" style="display: none;"></div>
+        </div>
+
+        <div id="code-step" style="display: none;">
+            <div class="input-group">
+                <label>Код подтверждения</label>
+                <input
+                    type="text"
+                    id="verification-code"
+                    placeholder="6-значный код"
+                    autocomplete="one-time-code"
+                    maxlength="6"
+                    inputmode="numeric"
+                >
+            </div>
+
+            <button type="submit" id="verify-code-btn">Подтвердить и войти</button>
+
+            <div id="code-message" class="message" style="display: none;"></div>
+
+            <div class="secondary-action" id="resend-area">
+                <span id="resend-timer" class="timer"></span>
+                <button id="resend-code-btn" class="resend-link" type="button" style="display: none;">
+                    Отправить код повторно
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-link-wrap">
+        <a href="welcome.html" class="bottom-back-link" id="top-back-link">← На главную</a>
+    </div>
+</div>
+
+<script>
+    // =====================================================
+    // ЭЛЕМЕНТЫ ФОРМ
+    // =====================================================
+
+    const passwordForm = document.getElementById('password-form');
+    const codeForm = document.getElementById('code-form');
+
+    const modeBtns = document.querySelectorAll('.mode-btn');
+
+    const loginInput = document.getElementById('login');
+    const passwordInput = document.getElementById('password');
+    const passwordToggle = document.getElementById('password-toggle');
+    const passwordSubmit = document.getElementById('password-submit');
+    const passwordMessageDiv = document.getElementById('password-message');
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+
+    const emailInput = document.getElementById('email');
+    const sendCodeBtn = document.getElementById('send-code-btn');
+    const emailMessageDiv = document.getElementById('email-message');
+    const emailStepDiv = document.getElementById('email-step');
+    const codeStepDiv = document.getElementById('code-step');
+
+    const verificationCodeInput = document.getElementById('verification-code');
+    const verifyCodeBtn = document.getElementById('verify-code-btn');
+    const codeMessageDiv = document.getElementById('code-message');
+
+    const resendCodeBtn = document.getElementById('resend-code-btn');
+    const resendTimerSpan = document.getElementById('resend-timer');
+
+    const topBackLink = document.getElementById('top-back-link');
+
+    let currentEmail = '';
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    let codeWaitingMode = false;
+    let codeSessionActive = false;
+    let allowPageLeave = false;
+
+    // =====================================================
+    // ЗАПОМНИТЬ МЕНЯ
+    // =====================================================
+
+    function loadRememberedOrganizer() {
+        const remembered = localStorage.getItem('organizerRemember') === 'true';
+        const savedLogin = localStorage.getItem('organizerLogin') || '';
+
+        if (remembered) {
+            rememberMeCheckbox.checked = true;
+            if (savedLogin) loginInput.value = savedLogin;
+        }
+    }
+
+    function saveOrganizerAuth(login, remember) {
+        clearCachedOrganizerProfile();
+
+        sessionStorage.setItem('organizerAuth', 'true');
+        sessionStorage.setItem('organizerLogin', login);
+
+        if (remember) {
+            localStorage.setItem('organizerRemember', 'true');
+            localStorage.setItem('organizerAuth', 'true');
+            localStorage.setItem('organizerLogin', login);
+        } else {
+            localStorage.removeItem('organizerRemember');
+            localStorage.removeItem('organizerAuth');
+            localStorage.removeItem('organizerLogin');
+        }
+    }
+
+    loadRememberedOrganizer();
+
+    // =====================================================
+    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // =====================================================
+
+    function showMessage(element, text, type) {
+        element.innerText = text;
+        element.className = 'message ' + type;
+        element.style.display = 'block';
+    }
+
+    function hideMessage(element) {
+        element.innerText = '';
+        element.style.display = 'none';
+    }
+
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+
+    // =====================================================
+    // КЭШ ПРОФИЛЯ ОРГАНИЗАТОРА
+    // =====================================================
+
+    function clearCachedOrganizerProfile() {
+        sessionStorage.removeItem('organizerName');
+        sessionStorage.removeItem('organizerEmail');
+        sessionStorage.removeItem('organizerRole');
+        sessionStorage.removeItem('organizerId');
+        sessionStorage.removeItem('organizerProfileCached');
+    }
+
+    async function cacheOrganizerProfileOnce(login) {
+        const normalizedLogin = String(login || '').trim();
+
+        if (!normalizedLogin) return;
+
+        const alreadyCached = sessionStorage.getItem('organizerProfileCached') === 'true';
+        const cachedName = sessionStorage.getItem('organizerName') || '';
+        const cachedEmail = sessionStorage.getItem('organizerEmail') || '';
+
+        if (alreadyCached && (cachedName || cachedEmail)) {
+            return;
+        }
+
+        if (typeof getOrganizerProfile !== 'function') {
+            console.warn('Функция getOrganizerProfile не подключена, профиль будет загружен позже.');
+            return;
+        }
+
+        try {
+            const profile = await getOrganizerProfile(normalizedLogin);
+
+            if (!profile) return;
+
+            const profileLogin = profile.login || normalizedLogin;
+            const fullName = profile.name || profileLogin;
+            const profileEmail = profile.email || profileLogin;
+
+            sessionStorage.setItem('organizerAuth', 'true');
+            sessionStorage.setItem('organizerLogin', profileLogin);
+            sessionStorage.setItem('organizerName', fullName);
+            sessionStorage.setItem('organizerEmail', profileEmail);
+            sessionStorage.setItem('organizerProfileCached', 'true');
+
+            if (profile.role) {
+                sessionStorage.setItem('organizerRole', profile.role);
+            }
+
+            if (profile.organizerId) {
+                sessionStorage.setItem('organizerId', profile.organizerId);
+            }
+        } catch (error) {
+            console.warn('Не удалось предварительно загрузить профиль организатора:', error);
+        }
+    }
+
+    function enableLeaveWarning() {
+        codeWaitingMode = true;
+        allowPageLeave = false;
+    }
+
+    function disableLeaveWarning() {
+        codeWaitingMode = false;
+        allowPageLeave = true;
+    }
+
+    function setActiveButton(mode) {
+        modeBtns.forEach(btn => {
+            if (btn.dataset.mode === mode) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    function showPasswordMode() {
+        passwordForm.style.display = 'block';
+        codeForm.style.display = 'none';
+        setActiveButton('password');
+        loginInput.focus();
+    }
+
+    function showCodeMode() {
+        passwordForm.style.display = 'none';
+        codeForm.style.display = 'block';
+        setActiveButton('code');
+
+        if (codeSessionActive && currentEmail) {
+            emailStepDiv.style.display = 'none';
+            codeStepDiv.style.display = 'block';
+            verificationCodeInput.focus();
+        } else {
+            emailStepDiv.style.display = 'block';
+            codeStepDiv.style.display = 'none';
+            emailInput.focus();
+        }
+    }
+
+    // =====================================================
+    // ПРЕДУПРЕЖДЕНИЕ ПРИ ОБНОВЛЕНИИ / ЗАКРЫТИИ / ПЕРЕХОДЕ
+    // =====================================================
+
+    window.addEventListener('beforeunload', function (e) {
+        if (codeWaitingMode && !allowPageLeave) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
+    });
+
+    topBackLink.addEventListener('click', function (e) {
+        if (codeWaitingMode && !allowPageLeave) {
+            const confirmLeave = confirm(
+                'Код уже отправлен на почту. Если вы уйдёте со страницы, вход по этому коду может быть прерван. Перейти на главную?'
+            );
+
+            if (!confirmLeave) {
+                e.preventDefault();
+                return;
+            }
+
+            allowPageLeave = true;
+        }
+    });
+
+    // =====================================================
+    // ГЛАЗИК ДЛЯ ПАРОЛЯ
+    // =====================================================
+
+    passwordToggle.addEventListener('click', function () {
+        const isPasswordHidden = passwordInput.type === 'password';
+
+        passwordInput.type = isPasswordHidden ? 'text' : 'password';
+        passwordToggle.innerText = isPasswordHidden ? '🙈' : '👁️';
+
+        passwordToggle.setAttribute(
+            'aria-label',
+            isPasswordHidden ? 'Скрыть пароль' : 'Показать пароль'
+        );
+
+        passwordInput.focus();
+    });
+
+    // =====================================================
+    // ПЕРЕКЛЮЧЕНИЕ МЕЖДУ ФОРМАМИ
+    // =====================================================
+
+    function setActiveMode(mode) {
+        if (mode === 'password') {
+            showPasswordMode();
+            return;
+        }
+
+        if (mode === 'code') {
+            showCodeMode();
+            return;
+        }
+    }
+
+    function resetCodeForm() {
+        emailStepDiv.style.display = 'block';
+        codeStepDiv.style.display = 'none';
+
+        emailInput.value = '';
+        verificationCodeInput.value = '';
+
+        hideMessage(emailMessageDiv);
+        hideMessage(codeMessageDiv);
+
+        sendCodeBtn.disabled = false;
+        sendCodeBtn.innerText = 'Отправить код';
+
+        verifyCodeBtn.disabled = false;
+        verifyCodeBtn.innerText = 'Подтвердить и войти';
+
+        currentEmail = '';
+        codeSessionActive = false;
+
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        timerSeconds = 0;
+
+        resendTimerSpan.innerHTML = '';
+        resendTimerSpan.style.display = 'none';
+
+        resendCodeBtn.disabled = false;
+        resendCodeBtn.style.display = 'none';
+
+        disableLeaveWarning();
+    }
+
+    modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            setActiveMode(btn.dataset.mode);
+        });
+    });
+
+    // =====================================================
+    // ВХОД ПО ПАРОЛЮ
+    // =====================================================
+
+    passwordSubmit.addEventListener('click', async () => {
+        const login = loginInput.value.trim();
+        const password = passwordInput.value.trim();
+        const remember = rememberMeCheckbox.checked;
+
+        if (!login || !password) {
+            showMessage(passwordMessageDiv, 'Заполните все поля', 'error');
+            return;
+        }
+
+        passwordSubmit.disabled = true;
+        passwordSubmit.innerText = 'Проверка...';
+        hideMessage(passwordMessageDiv);
+
+        try {
+            const isValid = await checkOrganizer(login, password);
+
+            if (isValid) {
+                disableLeaveWarning();
+
+                saveOrganizerAuth(login, remember);
+                await cacheOrganizerProfileOnce(login);
+
+                window.location.href = 'organizer.html';
+            } else {
+                showMessage(passwordMessageDiv, 'Неверный логин или пароль', 'error');
+
+                passwordSubmit.disabled = false;
+                passwordSubmit.innerText = 'Войти';
+            }
+
+        } catch (err) {
+            console.error('Ошибка входа по паролю:', err);
+
+            showMessage(passwordMessageDiv, 'Ошибка соединения. Попробуйте позже.', 'error');
+
+            passwordSubmit.disabled = false;
+            passwordSubmit.innerText = 'Войти';
+        }
+    });
+
+    // =====================================================
+    // ТАЙМЕР ПОВТОРНОЙ ОТПРАВКИ
+    // =====================================================
+
+    function startResendTimer(seconds = 60) {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        timerSeconds = seconds;
+
+        resendCodeBtn.style.display = 'none';
+        resendCodeBtn.disabled = true;
+
+        resendTimerSpan.style.display = 'inline-block';
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+            timerSeconds--;
+
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+
+                resendTimerSpan.innerHTML = '';
+                resendTimerSpan.style.display = 'none';
+
+                resendCodeBtn.disabled = false;
+                resendCodeBtn.style.display = 'inline-block';
+
+                return;
+            }
+
+            updateTimerDisplay();
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        resendTimerSpan.innerHTML = `Повторная отправка через ${timerSeconds} сек.`;
+    }
+
+    // =====================================================
+    // ВХОД ПО КОДУ
+    // =====================================================
+
+    async function requestCode() {
+        const email = emailInput.value.trim();
+
+        if (!email) {
+            showMessage(emailMessageDiv, 'Введите email', 'error');
+            return false;
+        }
+
+        if (!isValidEmail(email)) {
+            showMessage(emailMessageDiv, 'Введите корректный email', 'error');
+            return false;
+        }
+
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.innerText = 'Отправка...';
+
+        resendCodeBtn.disabled = true;
+        resendCodeBtn.style.display = 'none';
+
+        hideMessage(emailMessageDiv);
+        hideMessage(codeMessageDiv);
+
+        try {
+            const result = await sendLoginCode(email);
+
+            if (result.success) {
+                currentEmail = email;
+                codeSessionActive = true;
+
+                enableLeaveWarning();
+
+                showMessage(
+                    emailMessageDiv,
+                    `Код отправлен на ${email}. Действует 5 минут.`,
+                    'success'
+                );
+
+                emailStepDiv.style.display = 'none';
+                codeStepDiv.style.display = 'block';
+
+                verificationCodeInput.value = '';
+                verificationCodeInput.focus();
+
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.innerText = 'Отправить код';
+
+                startResendTimer(60);
+
+                return true;
+
+            } else {
+                showMessage(
+                    emailMessageDiv,
+                    result.error || 'Ошибка отправки. Попробуйте позже.',
+                    'error'
+                );
+
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.innerText = 'Отправить код';
+
+                return false;
+            }
+
+        } catch (err) {
+            console.error('Ошибка отправки кода:', err);
+
+            showMessage(emailMessageDiv, 'Ошибка соединения. Попробуйте позже.', 'error');
+
+            sendCodeBtn.disabled = false;
+            sendCodeBtn.innerText = 'Отправить код';
+
+            return false;
+        }
+    }
+
+    sendCodeBtn.addEventListener('click', requestCode);
+
+    resendCodeBtn.addEventListener('click', async () => {
+        if (resendCodeBtn.disabled) return;
+
+        resendCodeBtn.disabled = true;
+        resendCodeBtn.style.display = 'none';
+
+        await requestCode();
+    });
+
+    verifyCodeBtn.addEventListener('click', async () => {
+        const code = verificationCodeInput.value.trim();
+
+        if (!code || code.length < 6) {
+            showMessage(codeMessageDiv, 'Введите 6-значный код из письма', 'error');
+            return;
+        }
+
+        verifyCodeBtn.disabled = true;
+        verifyCodeBtn.innerText = 'Проверка...';
+
+        hideMessage(codeMessageDiv);
+
+        try {
+            const isValid = await verifyLoginCode(currentEmail, code);
+
+            if (isValid) {
+                disableLeaveWarning();
+
+                clearCachedOrganizerProfile();
+
+                sessionStorage.setItem('organizerAuth', 'true');
+                sessionStorage.setItem('organizerLogin', currentEmail);
+
+                await cacheOrganizerProfileOnce(currentEmail);
+
+                localStorage.removeItem('organizerRemember');
+                localStorage.removeItem('organizerAuth');
+                localStorage.removeItem('organizerLogin');
+
+                window.location.href = 'organizer.html';
+
+            } else {
+                showMessage(codeMessageDiv, 'Неверный или просроченный код. Запросите новый.', 'error');
+
+                verifyCodeBtn.disabled = false;
+                verifyCodeBtn.innerText = 'Подтвердить и войти';
+            }
+
+        } catch (err) {
+            console.error('Ошибка проверки кода:', err);
+
+            showMessage(codeMessageDiv, 'Ошибка соединения. Попробуйте позже.', 'error');
+
+            verifyCodeBtn.disabled = false;
+            verifyCodeBtn.innerText = 'Подтвердить и войти';
+        }
+    });
+
+    // =====================================================
+    // ОГРАНИЧЕНИЕ ВВОДА КОДА ТОЛЬКО ЦИФРАМИ
+    // =====================================================
+
+    verificationCodeInput.addEventListener('input', () => {
+        verificationCodeInput.value = verificationCodeInput.value
+            .replace(/\D/g, '')
+            .slice(0, 6);
+    });
+
+    // =====================================================
+    // ENTER В ПОЛЯХ
+    // =====================================================
+
+    verificationCodeInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            verifyCodeBtn.click();
+        }
+    });
+
+    emailInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            requestCode();
+        }
+    });
+
+    loginInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            passwordSubmit.click();
+        }
+    });
+
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            passwordSubmit.click();
+        }
+    });
+</script>
+</body>
+</html>

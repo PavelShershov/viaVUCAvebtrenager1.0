@@ -1,0 +1,13 @@
+{
+    "gameId": "sidja",
+    "gameName": "Сиджа (7x7)",
+    "taskFiles": ["sid_task1.js", "sid_task2.js", "sid_task3.js"],
+    "cellsCount": 49,
+    "images": {
+        "board": "pole.png",
+        "pieces": {
+            "yellow": "org.png",
+            "red": "red.png"
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "gameId": "surakarta",
+    "gameName": "Суракарта",
+    "taskFiles": ["task1_surakarta.js", "task2_surakarta.js", "task3_surakarta.js"],
+    "cellsCount": 36,
+    "images": {
+        "board": "pole.png",
+        "pieces": {
+            "purple": "perpl.png",
+            "gray": "gray.png"
+        }
+    }
+}

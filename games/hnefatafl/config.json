@@ -1,0 +1,19 @@
+{
+    "gameId": "hnefatafl",
+    "gameName": "Хнефатафл",
+    "taskFiles": ["hne_task1.js", "hne_task2.js"],
+    "cellsCount": 121,
+    "images": {
+        "board": "pole.png",
+        "pieces": {
+            "red": "red.png",
+            "green": "gre.png",
+            "king": "gyrl.png"
+        }
+    },
+    "boardSize": {
+        "rows": 11,
+        "cols": 11
+    },
+    "description": "Скандинавская игра тафлы. Король должен сбежать, атака окружает."
+}
